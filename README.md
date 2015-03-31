@@ -15,11 +15,11 @@ Note this is not on Atmosphere yet due to alpha nature.
 
 ##Usage
 
-TODO:  Currently needs some TLC to get to work and I have not documented all the steps.  Look at the [test site code]() to get an idea of what this can do.
+TODO:  Currently needs some TLC to get to work and I have not documented all the steps.  Look at the [test site code](https://github.com/pfafman/meteor-materialize-testsite) to get an idea of what this can do.
 
 ## Demo
 
-http://iron-table-test.meteor.com
+http://pfafman.meteor.com
 
 
 ## License
