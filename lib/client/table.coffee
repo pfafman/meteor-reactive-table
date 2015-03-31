@@ -36,10 +36,20 @@ Template.reactiveTableNav.helpers
   pageDownDisable: ->
     @skip()is 0
       
-
+  showNavCount: ->
+    @recordCount() > @increment()
   
   pageUpDisable: ->
     @skip() + @increment() > @recordCount()
+
+  recordCountStart: ->
+    @skip() + 1
+
+  recordCountEnd: ->
+    Math.min(@skip() + @limit(), @recordCount())
+
+  recordCountDisplay: ->
+    @recordCount() + " " + @recordsName()
       
 
 
@@ -84,12 +94,11 @@ Template.reactiveTableRow.events
 
   'click .reactive-table-delete-record': (event, tmpl) ->
     console.log("delete", @,  Template.parentData(1)) if DEBUG
-    Template.parentData(1).options.onDelete?(@)
+    Template.parentData(1).options?.onDelete?(@) or Template.parentData(1).onDelete?(@)
 
 
   'click .reactive-table-edit-record': (event, tmpl) ->
-    console.log("edit: TODO: Enable Modal Edit", @) if DEBUG
-    Template.parentData(1).options.onEdit?(@)
-
+    console.log("edit: TODO: Enable Modal Edit?", @,  Template.parentData(1)) if DEBUG
+    Template.parentData(1).options?.onEdit?(@) or Template.parentData(1).onEdit?(@)
 
 

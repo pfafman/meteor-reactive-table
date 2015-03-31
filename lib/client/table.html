@@ -90,6 +90,14 @@
   <div class="reactive-nav">
     <a href="" class="page-down {{#if pageDownDisable}}disabled{{/if}}">{{{pageDownSymbol}}}</a>
     <a href="" class="page-up {{#if pageUpDisable}}disabled{{/if}}">{{{pageUpSymbol}}}</a>
+    
+    &nbsp;
+    
+    {{#if showNavCount}}
+      Displaying {{recordCountStart}} - {{recordCountEnd}} of
+    {{/if}}
+    {{recordCountDisplay}}
+
   </div>
 </template>
 

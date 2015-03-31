@@ -1,54 +1,49 @@
 
 DEBUG = true
 
+
+
 class @ReactiveTable
   classID: 'ReactiveTable'
   
-  defaults:
-    recordName: 'record'
-    colToUseForName : '_id'
-    selfPublish     : true
-    limit           : 10
-    sortColumn      : '_id'
-    sortDirection   : 1
+  collection      : null
+  selfPublish     : true
+  recordName      : 'Record'
+  colToUseForName : 'name'
+  sortColumn      : 'name'
+  doRowLink       : true
+  schema          : null
+  downloadFields  : null
+  #methodOnInsert  : 'insertTestDataRecord'
+  #methodOnUpdate  : 'updateTestDataRecord'
+  #methodOnRemove  : 'removeTestDataRecord'
+  
+  
+  name: ->
+    @collection?._name
 
-    defaultSelect   : {}
-    showFilter      : false
-    errorMessage    : ''
-    cursor          : null
-    
-    _subscriptionComplete: false
+  
+  countName: ->
+    @name() + 'Count'
 
+  
+  publicationName: ->
+    'reactiveTable_publish_' + @name()
 
+  
   constructor: (options = {}) ->
-    console.log("ReactiveTable constructor") if DEBUG
+    @setup()
 
-    @options = _.defaults(options, @defaults)
 
-    throw new Error("ReactiveTable: must specify collection") unless @options.collection instanceof Mongo.Collection
-
-    if Meteor.isClient
-      @_limit  = new ReactiveVar(@options.limit)
-      @_skip   = new ReactiveVar(0)
-      @_select = new ReactiveVar(@options.defaultSelect)
-      
-      @filterColumn  = new ReactiveVar()
-      @filterValue   = new ReactiveVar('')
-      @sortColumn    = new ReactiveVar(@options.sortColumn)
-      @sortDirection = new ReactiveVar(@options.sortDirection)
-
-    if not @options.publicationName
-      @options.publicationName  = 'reactiveTable_publish_' + @name()
-      @options.selfPublish = true
-    else
-      @options.selfPublish = false
-
+  setup: ->
+    collection = @collection
+    name = @name()
     if Meteor.isServer
-      if @options.selfPublish
-        collection = @options.collection
+      if @selfPublish
         countName  = @countName()
+        publicationName = @publicationName()
 
-        Meteor.publish @publicationName(), (select, sort, limit, skip) ->
+        Meteor.publish publicationName, (select, sort, limit, skip) ->
           console.log("publish via ReactiveTable", countName, select, sort, limit, skip) if DEBUG
           check(select, Match.Optional(Match.OneOf(Object, null)))
           check(sort, Match.Optional(Match.OneOf(Object, null)))
@@ -65,59 +60,86 @@ class @ReactiveTable
             skip: skip
 
 
-      meths = {}
-      
-      #if true #@doDownloadLink
-      meths["reactiveTable_" + @name() + "_getCSV"] = (select = {}, fields = {}) ->
-        csv = []
-        fieldKeys = _.keys(fields)
-        csv.push fieldKeys.join(',')
-        cursor = collection.find? select,
-          fields: fields
-        if cursor?.forEach?
-          cursor.forEach (rec) ->
-            row = []
-            for fieldKey in fieldKeys
-              subElements = fieldKey.split('.')
-              value = rec
-              for subElement in subElements
-                value = value?[subElement]
-              row.push value
-            csv.push row.join(',')
-        csv.join("\n")
-              
-      Meteor.methods meths
+    meths = {}
+    
+    #if true #@doDownloadLink
+    meths["reactiveTable_" + name + "_getCSV"] = (select = {}, fields = {}) ->
+      csv = []
+      fieldKeys = _.keys(fields)
+      csv.push fieldKeys.join(',')
+      cursor = collection.find? select,
+        fields: fields
+      if cursor?.forEach?
+        cursor.forEach (rec) ->
+          row = []
+          for fieldKey in fieldKeys
+            subElements = fieldKey.split('.')
+            value = rec
+            for subElement in subElements
+              value = value?[subElement]
+            row.push value
+          csv.push row.join(',')
+      csv.join("\n")
+            
+    Meteor.methods meths
 
 
-  getTable: (options = {}) ->
-    if Meteor.isClient
-      @options = _.extend(@options, options)
+  newTable: (options = {}) ->
+    new ReactiveTableInstance(@, options)
 
-      @_limit.set(@options.limit)
-      @_skip.set(0)
-      @_select.set(@options.defaultSelect)
-      @filterColumn.set(null)
-      @filterValue.set('')
-      @sortColumn.set(@options.sortColumn)
-      @sortDirection.set(@options.sortDirection)
 
-    return @
+  # Overrides ...
+  insertOk: (record)->
+    false
+
+  deleteAllOk: ->
+    false
+
+  deleteOk: (record) ->
+    false
+
+  editOk: (record) ->
+    false
+
+
+
+class ReactiveTableInstance
+
+  defaults:
+    recordName: 'record'
+    colToUseForName : '_id'
+    limit           : 10
+    sortColumn      : '_id'
+    sortDirection   : 1
+
+    defaultSelect   : {}
+    showFilter      : false
+    errorMessage    : ''
+    cursor          : null
+    
+    _subscriptionComplete: false
+
+
+  constructor: (tableClass, options = {}) ->
+    @collection = tableClass.collection
+    console.log("ReactiveTable constructor", @, @collection) if DEBUG
+
+    @options = _.defaults(options, _.omit(tableClass, ['setUp', 'newTable']), @defaults)
+
+    throw new Error("ReactiveTable: must specify collection") unless @collection instanceof Mongo.Collection
+
+    @_limit  = new ReactiveVar(@options.limit)
+    @_skip   = new ReactiveVar(0)
+    @_select = new ReactiveVar(@options.defaultSelect)
+    
+    @filterColumn  = new ReactiveVar()
+    @filterValue   = new ReactiveVar('')
+    @sortColumn    = new ReactiveVar(@options.sortColumn)
+    @sortDirection = new ReactiveVar(@options.sortDirection)
 
 
   publicationName: ->
-    @options.publicationName
-
-
-  collection: ->
-    @options.collection
-
-
-  name: ->
-    @options.collection._name
-
-
-  countName: ->
-    @name() + 'Count'
+    @options.publicationName()
 
 
   sort: ->
@@ -171,7 +193,7 @@ class @ReactiveTable
 
 
   _cols: ->
-    theColumns = @options.schema or @collection()?.schema
+    theColumns = @options.schema or @collection?.schema
     if theColumns instanceof Array
       colObj = {}
       for col in theColumns
@@ -207,12 +229,11 @@ class @ReactiveTable
 
 
   recordCount: ->
-    console.log("recordCount", @countName(), Counts.get(@countName())) if DEBUG
-    Counts.get(@countName())
+    Counts.get(@options.countName())
 
 
   records: ->
-    @collection().find @select(),
+    @collection.find @select(),
       limit: @limit()
       #skip: @skip()
       sort: @sort()
@@ -230,7 +251,7 @@ class @ReactiveTable
         if not col.hide?()
           value = @valueFromRecord(key, col, record)
           if col.display?
-            value = col.display(value, record, @params)
+            value = col.display(value, record)
           if col.type is 'boolean' and not col.template?
             col.template = 'reactiveTableCheckbox'
           else if col.type is 'select' and not col.template?
@@ -252,8 +273,8 @@ class @ReactiveTable
         _id: record._id
         recordName: record[@colToUseForName()]
         recordDisplayName: @recordName() + ' ' + record[@colToUseForName()]
-        editOk: @editOk(record)
-        deleteOk: @deleteOk(record)
+        editOk: @options.editOk(record)
+        deleteOk: @options.deleteOk(record)
         #extraControls: @extraControls?(record)
     
     recordsData
@@ -312,7 +333,7 @@ class @ReactiveTable
 
 
   recordName: ->
-    @options.recordName or @collection()._name
+    @options.recordName or @collection._name
 
 
   recordsName: ->
@@ -323,23 +344,6 @@ class @ReactiveTable
     @options.colToUseForName or '_id'
   
 
-  # Overrides ...
-
-  insertOk: (record)->
-    # Check Record Here on insert
-    true
-
-
-  deleteAllOk: ->
-    false
-
-
-  deleteOk: (record) ->
-    true
-
-
-  editOk: (record) ->
-    true
-
+  
 
 
