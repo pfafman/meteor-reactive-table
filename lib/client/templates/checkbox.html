@@ -1,0 +1,20 @@
+
+<template name="reactiveTableCheckbox">
+  <div class="check-mark {{#if column.contenteditable}}pointer{{/if}}">
+    {{#if doEdit}}
+      <input class="check-mark-checkbox" type="checkbox" id="checkbox" checked="{{value}}">
+      <label for="checkbox"></label>
+    {{else}}
+      {{#if value}}
+        <i class="fa {{checkedMark}}"></i>
+      {{else}}
+        <i class="fa {{notCheckMark}}"></i>
+      {{/if}}
+    {{/if}}
+  </div>
+</template>
+
+
+<template name="reactiveTableCheckboxCheckbox">
+  <input class="check-mark-checkbox" type="checkbox" checked="{{value}}">
+</template>

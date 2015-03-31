@@ -1,0 +1,28 @@
+
+<template name="reactiveTableSelect">
+  <div class="select">
+  {{#if doEdit}}
+    {{> reactiveTableSelectSelect}}
+  {{else}}
+    <div class="select-view">
+      {{getValue}}
+    </div>
+  {{/if}}
+  </div>
+</template>
+
+<template name="reactiveTableSelectSelect">
+  <select>
+    {{> reactiveTableOptions}}
+  </select>
+</template>
+
+<template name="reactiveTableOptions">
+  {{#each options}}
+    {{> reactiveTableOption}}
+  {{/each}}
+</template>
+
+<template name="reactiveTableOption">
+  <option value="{{key}}" {{disabled}} {{selected}}>{{val}}</option>
+</template>

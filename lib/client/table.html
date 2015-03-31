@@ -1,0 +1,218 @@
+
+<template name="reactiveTable">
+  <div class="reactive-table" style="{{style}}">
+    {{> reactiveTableHeading}} 
+
+    {{#if showFilter}}
+      {{> reactiveTableFilter}}
+    {{/if}}
+            
+    {{#if haveData}}
+
+      {{> reactiveTableNav}}
+                
+      <div class="reactive-table-container {{tableContainerClass}}">
+        <table class="{{tableClass}}">
+          <thead>
+            <tr>
+              {{> reactiveTableHead}}
+            </tr>
+          </thead>
+
+          <tbody class="{{rowLink}}" data-link="{{dataLink}}">
+            {{> reactiveTableBody}}
+          </tbody>
+        </table>
+      </div>
+      
+    {{else}}
+      {{#unless Template.subscriptionsReady}}
+        {{> reactiveTableLoading}}
+      {{else}}
+        <div class="card-panel">
+          <i>No {{recordsName}}!</i>
+        </div>
+      {{/unless}}
+    {{/if}}
+  </div>
+</template>
+
+
+<template name="reactiveTableHeading">
+  <div class="row reactive-table-heading {{classes.heading}}">
+    {{#if tableTitle}}
+      <h3 class="truncate col l4 m4 s12 {{#if showTitleLargeOnly}}hide-on-med-and-down{{/if}}">
+        {{#if showBackButton}}
+          <a class="btn-flat waves-effect waves-light back-btn" onclick="window.history.back()"><i class="mdi-navigation-chevron-left"></i></a>
+        {{/if}}
+
+        {{{tableTitle}}}
+        {{#if subTitle}}
+          <div class="subtitle">{{{subTitle}}}</div>
+        {{/if}}
+      </h3>
+    {{/if}}
+
+    <span class="links-col col {{#if showTitleLargeOnly}}l8{{else}}{{#if tableTitle}}m8{{/if}}{{/if}} s12 right-align">
+      {{#if extraLinkTemplate}}
+        {{> Template.dynamic template=extraLinkTemplate}}
+      {{/if}}
+
+      {{#if doDownloadLink}}
+        <button id="download-link" class="btn {{downloadButtonColor}} waves-effect waves-light">
+          Download<i class="mdi-file-cloud-download right "></i> 
+        </button>
+      {{/if}}
+
+      {{#if newRecordRoute}}
+          <a class="btn {{newButtonColor}} waves-effect waves-light" href="{{pathFor newRecordRoute}}">
+            {{newRecordTitle}}<i class="mdi-file-cloud-download right"></i>
+          </a>
+      {{else}}
+        {{#if showNewButton}}
+          <button id="reactive-table-new-record" class="btn {{newButtonColor}} waves-effect waves-light">
+            {{newRecordTitle}}<i class="mdi-content-add-circle right"></i>
+          </button>
+        {{/if}}
+      {{/if}}
+    </span>
+  </div>
+</template>
+
+
+<template name="reactiveTableFilter">
+  <div class="reactive-filter">
+    FILTER HERE
+  </div>
+</template>
+
+<template name="reactiveTableNav">
+  <div class="reactive-nav">
+    <a href="" class="page-down {{#if pageDownDisable}}disabled{{/if}}">{{{pageDownSymbol}}}</a>
+    <a href="" class="page-up {{#if pageUpDisable}}disabled{{/if}}">{{{pageUpSymbol}}}</a>
+  </div>
+</template>
+
+<template name="reactiveTableHead">
+  {{#each headers}}
+    {{#unless hide}}
+      {{> reactiveTableHeader}}
+    {{/unless}}
+  {{/each}}
+  <th class="controls-header"> </th>
+</template>
+
+<template name="reactiveTableHeader">
+  <th class="{{column.class}}">
+    {{#if noSort}}
+      <button class="btn-flat waves-effect table-col-head" disabled="disabled">
+        {{capitalize colName}}
+      </button>
+    {{else}}
+      <a class="btn-flat waves-effect table-col-head tooltipped"
+        data-tooltip="{{#if sort}}Reverse sort order{{else}}Sort on {{capitalize colName}}{{/if}}"
+        rel='tooltip'>
+        {{capitalize colName}}
+        {{#if sort}} 
+          {{{sortArrow}}}
+        {{/if}}
+      </a>
+    {{/if}}
+  </th>
+</template>
+
+
+<template name="reactiveTableBody">
+  {{#each records}}
+    <tr>
+      {{> reactiveTableRow}}
+    </tr>
+  {{/each}}
+</template>
+
+<template name="reactiveTableRow">
+  {{#each colData}}
+    <td class="{{column.class}} {{rowLinkSkip}}">
+      {{#if aLink}}
+          <a href="{{aLink}}" class="{{#if title}}tooltipped{{/if}}" data-tooltip="{{#if title}}{{title}}{{/if}}" rel='{{#if title}}tooltip{{/if}}' target="{{column.target}}">
+              {{#if template}}
+                {{> Template.dynamic template=template}}
+              {{else}}
+                <div class="reactive-table-value"
+                contenteditable="{{contenteditable}}">{{{value}}}</div>
+              {{/if}}
+          </a>
+      {{else}}
+          {{#if template}}
+            {{> Template.dynamic template=template}}
+          {{else}}
+            <div class="reactive-table-value"
+            contenteditable="{{contenteditable}}">{{{value}}}</div>
+          {{/if}}
+      {{/if}}
+    </td>
+  {{/each}}
+  <td class="controls rowlink-skip">
+
+    {{#if showJSON}}
+      <a 
+        class="tooltipped show-record" 
+        data-tooltip="Show Record Object"
+        data-position="left"
+        rel='tooltip'
+      ><i class="mdi-action-description"></i></a>
+    {{/if}}
+
+    {{#if extraControls}}{{> extraControls }}{{/if}}
+
+    {{#if editOk}}
+        <a href="{{editRoute}}" class="{{editClass}} reactive-table-edit-record tooltipped"
+          data-tooltip='Edit Record' rel='tooltip'>
+          <i class="mdi-editor-mode-edit"></i>
+        </a>
+    {{/if}}
+
+    {{#if deleteOk}}
+        <a class="{{deleteClass}} reactive-table-delete-record" data-tooltip='Delete Record' rel='tooltip'>
+            <i class="mdi-action-delete"></i>
+        </a>
+    {{/if}}
+
+  </td>
+  {{#if showJSON}}
+    <div id="modal-json-{{_id}}" class="modal">
+      <div class="modal-content">
+        <h4>Record</h4>
+        <p>
+          {{{json}}}
+        </p>
+      </div>
+      <div class="modal-footer">
+        <a href="#" class="waves-effect waves-light btn-flat modal-action modal-close">Close</a>
+      </div>
+    </div>
+  {{/if}}
+</template>
+
+
+<template name="reactiveTableLoading">
+  <div class="reactiveTableLoading">
+    {{> reactiveTableSpinner}}
+  </div>
+</template>
+
+<template name="reactiveTableSpinner">
+  <div class="preloader-wrapper big active">
+    <div class="spinner-layer spinner-blue-only">
+      <div class="circle-clipper left">
+        <div class="circle"></div>
+      </div><div class="gap-patch">
+        <div class="circle"></div>
+      </div><div class="circle-clipper right">
+        <div class="circle"></div>
+      </div>
+    </div>
+  </div>
+</template>
+
+
