@@ -14,6 +14,7 @@ class @ReactiveTable
   doRowLink       : true
   schema          : null
   downloadFields  : null
+  newRecordTitle  : "New Record"
   #methodOnInsert  : 'insertTestDataRecord'
   #methodOnUpdate  : 'updateTestDataRecord'
   #methodOnRemove  : 'removeTestDataRecord'

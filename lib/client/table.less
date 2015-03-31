@@ -1,12 +1,27 @@
 
 .reactive-table {
-  overflow: auto;
 
   .reactive-nav {
+    font-size: 1.1em;
+    font-weight: 500;
+    width: 100%;
+    position: relative;
     padding: 0em 1em;
     a.disabled {
       color: #999;
       cursor: default;
+    }
+    .pager {
+      position: absolute;
+      right: 1em;
+      
+    }
+  }
+
+  .reactive-table-container {
+    overflow: auto;
+    tbody {
+      
     }
   }
 
