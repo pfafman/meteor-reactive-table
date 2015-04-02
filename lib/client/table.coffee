@@ -65,6 +65,15 @@ Template.reactiveTableNav.events
     @pageDown()
 
 
+Template.reactiveTableHeading.helpers
+  
+  showNewButton: ->
+    @options.newRecordRoute or @options.showNewButton
+
+
+  newRecordButtonText: ->
+    @options.newRecordButtonText or "New " + @recordName()
+
 
 Template.reactiveTableHeader.helpers
   # headers: ->

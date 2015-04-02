@@ -41,16 +41,16 @@
 <template name="reactiveTableHeading">
   <div class="row reactive-table-heading {{classes.heading}}">
     {{#if options.tableTitle}}
-      <h3 class="truncate col l4 m4 s12 {{#if options.showTitleLargeOnly}}hide-on-med-and-down{{/if}}">
+      <h4 class="truncate col l4 m4 s12 {{#if options.showTitleLargeOnly}}hide-on-med-and-down{{/if}}">
         {{#if options.showBackButton}}
-          <a class="btn-flat waves-effect waves-light back-btn" onclick="window.history.back()"><i class="mdi-navigation-chevron-left"></i></a>
+          <a class="back-btn" onclick="window.history.back()"><i class="mdi-navigation-chevron-left"></i></a>
         {{/if}}
 
         {{{options.tableTitle}}}
         {{#if options.subTitle}}
           <div class="subtitle">{{{options.subTitle}}}</div>
         {{/if}}
-      </h3>
+      </h4>
     {{/if}}
 
     <span class="links-col col {{#if options.showTitleLargeOnly}}l8{{else}}{{#if options.tableTitle}}m8{{/if}}{{/if}} s12 right-align">
@@ -64,16 +64,16 @@
         </button>
       {{/if}}
 
-      {{#if options.newRecordRoute}}
-          <a class="btn {{options.newButtonColor}} waves-effect waves-light" href="{{pathFor options.newRecordRoute}}">
+      {{#if showNewButton}}
+        {{#if options.newRecordRoute}}
+          <a class="btn {{options.newButtonClass}} waves-effect waves-light" href="{{pathFor options.newRecordRoute}}">
             <i class="mdi-content-add-circle left"></i>
-            {{options.newRecordTitle}}
+            {{newRecordButtonText}}
           </a>
-      {{else}}
-        {{#if options.showNewButton}}
+        {{else}}
           <button id="reactive-table-new-record" class="btn {{options.newButtonColor}} waves-effect waves-light">
             <i class="mdi-content-add-circle left"></i>
-            {{options.newRecordTitle}}
+            {{newRecordButtonText}}
           </button>
         {{/if}}
       {{/if}}
@@ -178,14 +178,15 @@
     {{#if extraControls}}{{> extraControls }}{{/if}}
 
     {{#if editOk}}
-        <a href="{{editRoute}}" class="{{editClass}} reactive-table-edit-record tooltipped"
+        <a href="{{#if ../options.editRoute}}{{pathFor ../options.editRoute}}{{/if}}" 
+          class="{{../options.editClass}} reactive-table-edit-record tooltipped"
           data-tooltip='Edit Record' rel='tooltip'>
           <i class="mdi-editor-mode-edit"></i>
         </a>
     {{/if}}
 
     {{#if deleteOk}}
-        <a class="{{deleteClass}} reactive-table-delete-record" data-tooltip='Delete Record' rel='tooltip'>
+        <a class="{{../options.deleteClass}} reactive-table-delete-record" data-tooltip='Delete Record' rel='tooltip'>
             <i class="mdi-action-delete"></i>
         </a>
     {{/if}}

@@ -1,6 +1,5 @@
 
-DEBUG = true
-
+DEBUG = false
 
 
 class @ReactiveTable
@@ -14,7 +13,7 @@ class @ReactiveTable
   doRowLink       : true
   schema          : null
   downloadFields  : null
-  newRecordTitle  : "New Record"
+  #newRecordText   : "New Record"
   #methodOnInsert  : 'insertTestDataRecord'
   #methodOnUpdate  : 'updateTestDataRecord'
   #methodOnRemove  : 'removeTestDataRecord'
@@ -36,29 +35,39 @@ class @ReactiveTable
     @setup()
 
 
+  pubSelectFilter: (select, pub) ->
+    select
+
+  # Can overwrite
+  publishser: (pub, select, sort, limit, skip) =>
+    select = @pubSelectFilter(select, pub)
+    if select?
+      if @countName()
+        publishCount pub, @countName(), @collection.find(select),
+          noReady: true
+      @collection.find select,
+        sort: sort
+        limit: limit
+        skip: skip
+    else
+      pub.ready()
+
+
   setup: ->
     collection = @collection
     name = @name()
     if Meteor.isServer
       if @selfPublish
-        countName  = @countName()
-        publicationName = @publicationName()
-
-        Meteor.publish publicationName, (select, sort, limit, skip) ->
-          console.log("publish via ReactiveTable", countName, select, sort, limit, skip) if DEBUG
+        publishFunc = @publishser
+    
+        Meteor.publish @publicationName(), (select, sort, limit, skip) ->
+          console.log("publish via ReactiveTable", name, select, sort, limit, skip) if DEBUG
           check(select, Match.Optional(Match.OneOf(Object, null)))
           check(sort, Match.Optional(Match.OneOf(Object, null)))
           check(skip, Number)
           check(limit, Number)
           
-          if countName
-            publishCount @, countName, collection.find(select),
-              noReady: true
-
-          collection.find select,
-            sort: sort
-            limit: limit
-            skip: skip
+          publishFunc(@, select, sort, limit, skip)
 
 
     meths = {}
@@ -242,7 +251,6 @@ class ReactiveTableInstance
 
 
   recordsData: ->
-    console.log('recordsData')
     recordsData = []
     cols = @_cols()
     for record in @records()
@@ -334,13 +342,13 @@ class ReactiveTableInstance
 
 
   recordName: ->
-    @options.recordName or @collection._name
+    @options.recordName or @name()
 
 
   recordsName: ->
     @options.recordsName or @recordName()+'s'
 
-
+  
   colToUseForName: ->
     @options.colToUseForName or '_id'
   
