@@ -10,9 +10,9 @@ class @ReactiveTable
   recordName      : 'Record'
   colToUseForName : 'name'
   sortColumn      : 'name'
-  doRowLink       : true
   schema          : null
   downloadFields  : null
+  rowLink         : null
   #newRecordText   : "New Record"
   #methodOnInsert  : 'insertTestDataRecord'
   #methodOnUpdate  : 'updateTestDataRecord'
@@ -64,8 +64,8 @@ class @ReactiveTable
           console.log("publish via ReactiveTable", name, select, sort, limit, skip) if DEBUG
           check(select, Match.Optional(Match.OneOf(Object, null)))
           check(sort, Match.Optional(Match.OneOf(Object, null)))
-          check(skip, Number)
-          check(limit, Number)
+          check(skip, Match.Optional(Match.OneOf(Number, null)))
+          check(limit, Match.Optional(Match.OneOf(Number, null)))
           
           publishFunc(@, select, sort, limit, skip)
 
@@ -113,7 +113,8 @@ class @ReactiveTable
 
 
 
-class ReactiveTableInstance
+class @ReactiveTableInstance
+  classID: 'ReactiveTableInstance'
 
   defaults:
     recordName: 'record'

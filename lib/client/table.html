@@ -1,38 +1,44 @@
 
 <template name="reactiveTable">
   <div class="reactive-table">
-    {{> reactiveTableHeading}} 
+    {{#if haveTable}}
+      {{> reactiveTableHeading}} 
 
-    {{#if showFilter}}
-      {{> reactiveTableFilter}}
-    {{/if}}
-            
-    {{#if haveData}}
-     
-      {{> reactiveTableNav}}
+      {{#if showFilter}}
+        {{> reactiveTableFilter}}
+      {{/if}}
+              
+      {{#if haveData}}
+       
+        {{> reactiveTableNav}}
 
-      <div class="reactive-table-container {{tableContainerClass}}" style="{{style}}">
-        <table class="{{tableClass}}">
-          <thead>
-            <tr>
-              {{> reactiveTableHead}}
-            </tr>
-          </thead>
+        <div class="reactive-table-container {{tableContainerClass}}" style="{{style}}">
+          <table class="{{tableClass}} {{moreTableClasses}}">
+            <thead>
+              <tr>
+                {{> reactiveTableHead}}
+              </tr>
+            </thead>
 
-          <tbody class="{{rowLink}}" data-link="{{dataLink}}">
-            {{> reactiveTableBody}}
-          </tbody>
-        </table>
-      </div>
-      
-    {{else}}
-      {{#unless Template.subscriptionsReady}}
-        {{> reactiveTableLoading}}
-      {{else}}
-        <div class="card-panel">
-          <i>No {{recordsName}}!</i>
+            <tbody>
+              {{> reactiveTableBody}}
+            </tbody>
+          </table>
         </div>
-      {{/unless}}
+        
+      {{else}}
+        {{#unless Template.subscriptionsReady}}
+          {{> reactiveTableLoading}}
+        {{else}}
+          <div class="reactive-table-container {{tableContainerClass}}" style="{{style}}">
+            <div class="reactive-table-no-records">
+              {{noRecordsText}}
+            </div>
+          </div>
+        {{/unless}}
+      {{/if}}
+    {{else}}
+      <h4>Error creating Table</h4>
     {{/if}}
   </div>
 </template>
@@ -175,7 +181,7 @@
       ><i class="mdi-action-description"></i></a>
     {{/if}}
 
-    {{#if extraControls}}{{> extraControls }}{{/if}}
+    {{#if ../options.extraControls}}{{> Template.dynamic template=../options.extraControls}}{{/if}}
 
     {{#if editOk}}
         <a href="{{#if ../options.editRoute}}{{pathFor ../options.editRoute}}{{/if}}" 

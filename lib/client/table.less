@@ -20,25 +20,49 @@
 
   .reactive-table-container {
     overflow: auto;
+
+    .reactive-table-no-records {
+      font-size: 1.4em;
+      font-style: italic;
+      width: 90%;
+      margin: auto;
+      padding-bottom: 1em;
+      text-align: center;
+    }
+
+    table {
+      thead {
+        th {
+          padding: 0em;
+          button {
+            margin-bottom: 0;
+          }
+          a {
+            margin-bottom: 0;
+          }
+        }
+      }
+      tbody {
+        
+      }
+      .controls {
+        white-space: nowrap;
+        a {
+          cursor: pointer;
+        }
+      }
+    }
+  }
+
+  table.rowlink {
     tbody {
-      
+      tr {
+        cursor: pointer;
+        td.rowlink-skip {
+          cursor: default;
+        }
+      }
     }
   }
 
-  th {
-    padding: 0em;
-    button {
-      margin-bottom: 0;
-    }
-    a {
-      margin-bottom: 0;
-    }
-  }
-
-  .controls {
-    white-space: nowrap;
-    a {
-      cursor: pointer;
-    }
-  }
 }

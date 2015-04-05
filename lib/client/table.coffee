@@ -1,8 +1,12 @@
 
 DEBUG = true
 
+# Capitalize first letter in string
+String::capitalize = ->
+  @charAt(0).toUpperCase() + @slice(1)
+
 Template.reactiveTable.onCreated ->
-  console.log('reactiveTable onCreated') if DEBUG
+  console.log('reactiveTable onCreated', @data) if DEBUG
   table = @data
   
   if table?.publicationName?()?
@@ -12,15 +16,26 @@ Template.reactiveTable.onCreated ->
       
 
 Template.reactiveTable.onRendered ->
-  # ...
+  console.log('reactiveTable onRendered') if DEBUG
 
 
 Template.reactiveTable.helpers
+  haveTable: ->
+    @ instanceof ReactiveTableInstance
+
   haveData: ->
+    console.log("haveData", @recordCount()) if DEBUG
     @recordCount() > 0
 
   style: ->
     @options.style
+
+  moreTableClasses: ->
+    if @options.rowLink?
+      "hoverable rowlink"
+
+  noRecordsText: ->
+    @options.noRecordsText or "No #{@recordsName().capitalize()}"
 
 
 Template.reactiveTableNav.helpers
@@ -65,6 +80,9 @@ Template.reactiveTableNav.events
     @pageDown()
 
 
+Template.reactiveTableHeading.onRendered ->
+  console.log("reactiveTableHeading onRendered", @data) if DEBUG
+
 Template.reactiveTableHeading.helpers
   
   showNewButton: ->
@@ -100,6 +118,11 @@ Template.reactiveTableBody.helpers
 
 
 Template.reactiveTableRow.events
+
+  'click td': (event, tmpl) ->
+    if Template.parentData(1).options.rowLink? and not $(event.target).hasClass('rowlink-skip')
+      Template.parentData(1).options.rowLink(@.record)
+    
 
   'click .reactive-table-delete-record': (event, tmpl) ->
     console.log("delete", @,  Template.parentData(1)) if DEBUG
