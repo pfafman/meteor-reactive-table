@@ -2,12 +2,12 @@
 Package.describe({
   //name: 'pfafman:meteor-reactive-table',
   summary: "Paging Table for Meteor",
-  version: "0.0.3",
+  version: "0.0.5",
   git: "https://github.com/pfafman/meteor-reactive-table.git",
 });
 
 Package.on_use(function (api, where) {
-  api.versionsFrom("METEOR@1.0.4");
+  api.versionsFrom("METEOR@1.1");
 
   // Client
   api.use(
@@ -24,9 +24,14 @@ Package.on_use(function (api, where) {
     'coffeescript',
     'mongo',
     'tmeasday:publish-counts',
+    //'softwarerero:accounts-t9n',
     ], ['client', 'server']);
 
-  api.imply('tmeasday:publish-counts@0.3.4');
+
+  api.imply([
+    'tmeasday:publish-counts@0.3.6',
+  ], ["client", "server"]);
+
 
   //api.imply('dburles:mongo-collection-instances');
 

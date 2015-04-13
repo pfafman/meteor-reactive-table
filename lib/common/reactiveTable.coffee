@@ -5,14 +5,15 @@ DEBUG = false
 class @ReactiveTable
   classID: 'ReactiveTable'
   
-  collection      : null
-  selfPublish     : true
-  recordName      : 'Record'
-  colToUseForName : 'name'
-  sortColumn      : 'name'
-  schema          : null
-  downloadFields  : null
-  rowLink         : null
+  collection       : null
+  selfPublish      : true
+  recordName       : 'Record'
+  colToUseForName  : 'name'
+  sortColumn       : 'name'
+  schema           : null
+  downloadFields   : null
+  rowLink          : null
+  tableCreateError : 'Error creating Table'
   #newRecordText   : "New Record"
   #methodOnInsert  : 'insertTestDataRecord'
   #methodOnUpdate  : 'updateTestDataRecord'
@@ -224,10 +225,13 @@ class @ReactiveTableInstance
       else
         canFilterOn = false
       tmpl = Template.instance()
+      colName = col.header or key
+      if T9n?
+        colName = T9n.get(colName)
       rtn.push
         key: key
         dataKey: dataKey
-        colName: col.header or key
+        colName: colName
         column: col
         noSort: col.noSort
         sort: dataKey is @sortColumn.get()

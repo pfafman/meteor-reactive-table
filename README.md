@@ -17,6 +17,8 @@ Note this is not on Atmosphere yet due to alpha nature.
 
 TODO:  Currently needs some TLC to get to work and I have not documented all the steps.  Look at the [test site code](https://github.com/pfafman/meteor-materialize-testsite) to get an idea of what this can do.
 
+Will use T9n if available !!!
+
 ## Demo
 
 http://pfafman.meteor.com

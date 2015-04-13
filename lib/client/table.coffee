@@ -1,9 +1,14 @@
 
-DEBUG = true
+DEBUG = false
+
+Template.registerHelper 'capitalize', (str) ->
+  str?.charAt?(0).toUpperCase() + str?.slice?(1)
 
 # Capitalize first letter in string
 String::capitalize = ->
   @charAt(0).toUpperCase() + @slice(1)
+
+
 
 Template.reactiveTable.onCreated ->
   console.log('reactiveTable onCreated', @data) if DEBUG
@@ -120,7 +125,7 @@ Template.reactiveTableBody.helpers
 Template.reactiveTableRow.events
 
   'click td': (event, tmpl) ->
-    if Template.parentData(1).options.rowLink? and not $(event.target).hasClass('rowlink-skip')
+    if Template.parentData(1).options.rowLink? and not $(event.currentTarget).hasClass('rowlink-skip')
       Template.parentData(1).options.rowLink(@.record)
     
 
