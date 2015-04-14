@@ -1,5 +1,5 @@
 ###
-DEBUG = true
+DEBUG = false
 
 Meteor.publish "reactiveTable", (tableName, selector={}, sort={}, skip=0, limit=10) ->
   
