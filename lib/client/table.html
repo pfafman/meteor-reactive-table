@@ -172,12 +172,13 @@
   {{/each}}
   <td class="controls rowlink-skip">
 
-    {{#if showJSON}}
+    {{#if ../options.showJSON}}
       <a 
-        class="tooltipped show-record" 
+        class="tooltipped show-record modal-trigger" 
         data-tooltip="Show Record Object"
         data-position="left"
         rel='tooltip'
+        href="#modal-json-{{_id}}"
       ><i class="mdi-action-description"></i></a>
     {{/if}}
 
@@ -198,7 +199,7 @@
     {{/if}}
 
   </td>
-  {{#if showJSON}}
+  {{#if ../options.showJSON}}
     <div id="modal-json-{{_id}}" class="modal">
       <div class="modal-content">
         <h4>Record</h4>

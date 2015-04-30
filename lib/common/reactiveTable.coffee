@@ -227,7 +227,7 @@ class @ReactiveTableInstance
       tmpl = Template.instance()
       colName = col.header or key
       if T9n?
-        colName = T9n.get(colName)
+        colName = T9n.get(colName, false)
       rtn.push
         key: key
         dataKey: dataKey

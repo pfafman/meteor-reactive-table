@@ -121,6 +121,14 @@ Template.reactiveTableBody.helpers
     @recordsData()
 
 
+Template.reactiveTableRow.onRendered ->
+  @$('.modal-trigger').leanModal()
+  
+
+Template.reactiveTableRow.helpers
+  json: ->
+    if @colData?[0]?.record?
+      '<pre>' + JSON.stringify(@colData[0].record, null, 2) + '</pre>'
 
 Template.reactiveTableRow.events
 
