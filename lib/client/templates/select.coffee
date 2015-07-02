@@ -4,7 +4,7 @@ Template.reactiveTableSelect.onCreated ->
 
 
 Template.reactiveTableSelectSelect.onRendered ->
-  $('select').material_select()
+  @$('select').material_select()
 
 
 Template.reactiveTableSelect.helpers

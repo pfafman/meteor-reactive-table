@@ -1,0 +1,174 @@
+
+<template name='reactiveTableForm'>
+  <form class="reactive-table-form">
+    {{#each columns}}
+      {{> reactiveTableFormItem}}
+    {{/each}}
+  </form>
+</template>
+
+<template name="reactiveTableFormItem">
+  {{#if hidden}}
+    <input type="hidden" name="{{key}}" value="{{value}}" />
+  {{else}}
+    
+      {{> Template.dynamic template=inputTemplate }}
+      {{#if showHelpText}}
+        <div class="reactive-table-help-block">{{helpText}}</div>
+      {{/if}}
+    
+  {{/if}}
+</template>
+
+
+<template name="reactiveTableFormInput">
+  <div class="{{#if static}}static-{{/if}}input-field">
+    
+    {{#if DO_NOT_DO_static}}
+      <input type="hidden" name="{{key}}" value="{{realValue}}" />
+    {{/if}}
+    
+    <label for="{{#unless static}}{{key}}{{/unless}}" class="{{#if value}}active{{/if}}">{{header}}</label>
+    <input 
+      type="{{displayType}}" 
+      class="form-control 
+        {{#if tooltip}}tooltipped{{/if}} validate 
+        {{#if hasError}}invalid{{/if}} 
+        {{#if hasSuccess}}valid{{/if}}" 
+      name="{{key}}"
+      id="{{key}}"
+      value="{{value}}"
+      required="{{required}}"
+      autofocus="{{autofocus}}"
+      placeholder="{{placeholderNOT}}"
+      checked="{{checked}}"
+      data-tooltip="{{tooltip}}" 
+      rel='{{#if tooltip}}tooltip{{/if}}' 
+      data-position="{{#if tooltip}}right{{/if}}"
+      disabled="{{static}}" />
+    {{#if hasIcon}}
+        <span class="{{iconClass}}"></span>
+    {{/if}}
+    {{#if hasError}}
+      <span class='red-text'>{{errorText}}</span>
+    {{/if}}
+   
+  </div>
+</template>
+
+<template name="reactiveTableFormDate">
+  <div class="reactive-table-input-field">
+    
+    <label class="reactive-table-select-label">{{header}}</label>
+    <input 
+      type="date" 
+      class="datepicker" 
+      name="{{key}}"
+      id="{{key}}"
+      value="{{value}}"
+      required="{{required}}"
+      autofocus="{{autofocus}}"
+      data-tooltip="{{tooltip}}" 
+      rel='{{#if tooltip}}tooltip{{/if}}' 
+      data-position="{{#if tooltip}}right{{/if}}"
+      disabled="{{static}}" />
+    {{#if hasIcon}}
+        <span class="{{iconClass}}"></span>
+    {{/if}}
+    {{#if hasError}}
+      <span class='red-text'>{{errorText}}</span>
+    {{/if}}
+  </div>
+</template>
+
+<template name="reactiveTableFormTime">
+  <div class="reactive-table-input-field">
+    
+    <label class="reactive-table-select-label">{{header}}</label>
+    <input 
+      type="time" 
+      class="timepicker" 
+      name="{{key}}"
+      id="{{key}}"
+      value="{{value}}"
+      required="{{required}}"
+      autofocus="{{autofocus}}"
+      data-tooltip="{{tooltip}}" 
+      rel='{{#if tooltip}}tooltip{{/if}}' 
+      data-position="{{#if tooltip}}right{{/if}}"
+      disabled="{{static}}" />
+    {{#if hasIcon}}
+        <span class="{{iconClass}}"></span>
+    {{/if}}
+    {{#if hasError}}
+      <span class='red-text'>{{errorText}}</span>
+    {{/if}} 
+  </div>
+</template>
+
+<template name="reactiveTableFormCheckbox">
+  <div class="reactive-table-input-field">
+    <input 
+      class="reactive-table-checkbox {{#if tooltip}}tooltipped{{/if}}" 
+      type="checkbox" 
+      name="{{key}}"
+      id="{{key}}"
+      value="{{value}}"
+      required="{{required}}"
+      autofocus="{{autofocus}}"
+      placeholder="{{placeholder}}"
+      checked="{{checked}}"
+      data-tooltip="{{tooltip}}" 
+      rel='{{#if tooltip}}tooltip{{/if}}' 
+      data-position="{{#if tooltip}}right{{/if}}"
+      disabled="{{static}}" />
+      {{#if static}}
+      <input 
+        type="hidden" 
+        name="{{key}}"
+        value="{{value}}"
+      />
+      {{/if}}
+    <label for="{{key}}">{{header}}</label>
+  </div>
+</template>
+
+
+<template name="reactiveTableFormTextarea">
+  <div class="input-field">
+    <label class="textarea-label {{#if value}}active{{/if}}" for="{{key}}">{{header}}</label>
+    <textarea 
+      class="materialize-textarea {{#if tooltip}}tooltipped{{/if}}" 
+      name="{{key}}" 
+      id="{{key}}"
+      rows="5"
+      required="{{required}}"
+      autofocus="{{autofocus}}"
+      placeholder="{{placeholder}}"
+      data-tooltip="{{tooltip}}" 
+      rel='{{#if tooltip}}tooltip{{/if}}'
+      data-position="{{#if tooltip}}right{{/if}}"
+      disabled="{{static}}">{{{value}}}</textarea>
+  </div>
+</template>
+
+
+<template name="reactiveTableFormSelect">
+  <div class="reactive-table-input-field">
+    <label class="reactive-table-select-label">{{header}}</label>
+    <select 
+      class="{{#if tooltip}}tooltipped{{/if}}" 
+      name="{{key}}"
+      required="{{required}}"
+      autofocus="{{autofocus}}"
+      placeholder="{{placeholderNot}}"
+      data-tooltip="{{tooltip}}" 
+      rel='{{#if tooltip}}tooltip{{/if}}'
+      data-position="{{#if tooltip}}right{{/if}}"
+      disabled="{{static}}" >
+      {{> reactiveTableOptions}}
+    </select>
+  </div>
+</template>
+
+

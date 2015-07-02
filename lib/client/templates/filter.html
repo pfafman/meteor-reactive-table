@@ -1,0 +1,31 @@
+
+<template name="reactiveTableFilter">
+  <div class="reactive-filter row">
+
+    <div class="input-field offset-s4 col s4">
+      <select id="filter-column">
+        <option value="_none_">{{irtblT9nit 'No Filter'}}</option>
+        {{#each headers}}
+          {{#if canFilterOn}}
+            <option value="{{key}}" selected="{{#if filterOnThisCol}}selected{{/if}}">{{capitalize colName}}</option>
+          {{/if}}
+        {{/each}}
+      </select>
+    </div>
+
+    <div class="input-field col s4 filter-value-col">
+      {{#if isBool}}
+        <span class="form-control">
+          <input type="checkbox" id="filter-value" checked="{{checked}}" />
+          <label for="filter-value">{{irtblT9nit "TRUE"}}</label>
+        </span>
+      {{else}}
+      <input type="{{filterType}}" id="filter-value" class="form-control"
+        autocomplete="off" spellcheck="false"
+        placeholder="Text to filter on" value="{{filterValue}}" />
+      {{/if}}
+        
+    </div>
+
+  </div>
+</template>

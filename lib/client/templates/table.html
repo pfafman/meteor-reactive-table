@@ -2,6 +2,7 @@
 <template name="reactiveTable">
   <div class="reactive-table">
     {{#if haveTable}}
+      
       {{> reactiveTableHeading}} 
 
       {{#if showFilter}}
@@ -27,7 +28,7 @@
         </div>
         
       {{else}}
-        {{#unless Template.subscriptionsReady}}
+        {{#unless firstReady}}
           {{> reactiveTableLoading}}
         {{else}}
           <div class="reactive-table-container {{tableContainerClass}}" style="{{style}}">
@@ -37,6 +38,7 @@
           </div>
         {{/unless}}
       {{/if}}
+
     {{else}}
       <h4>{{options.tableCreateError}}</h4>
     {{/if}}
@@ -87,12 +89,6 @@
   </div>
 </template>
 
-
-<template name="reactiveTableFilter">
-  <div class="reactive-filter">
-    FILTER HERE
-  </div>
-</template>
 
 <template name="reactiveTableNav">
   <div class="reactive-nav">

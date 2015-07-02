@@ -2,7 +2,7 @@
 Package.describe({
   name: 'pfafman:reactive-table',
   summary: "Paging Table for Meteor",
-  version: "0.0.6_4",
+  version: "0.0.7",
   git: "https://github.com/pfafman/meteor-reactive-table.git",
 });
 
@@ -13,7 +13,8 @@ Package.on_use(function (api, where) {
   api.use(
     [
     'templating',
-    'reactive-var',
+    //'reactive-var',
+    'reactive-dict',
     'less'
     ]
     , 'client');
@@ -24,7 +25,8 @@ Package.on_use(function (api, where) {
     'coffeescript',
     'mongo',
     'tmeasday:publish-counts',
-    //'softwarerero:accounts-t9n',
+    'softwarerero:accounts-t9n',
+    'pfafman:materialize-modal',
     ], ['client', 'server']);
 
 
@@ -37,9 +39,14 @@ Package.on_use(function (api, where) {
 
   api.add_files(
     [
-    'lib/client/table.html',
-    'lib/client/table.less',
-    'lib/client/table.coffee',
+    'lib/client/helpers.coffee',
+    'lib/client/templates/table.html',
+    'lib/client/templates/table.less',
+    'lib/client/templates/table.coffee',
+    'lib/client/templates/form.html',
+    'lib/client/templates/form.coffee',
+    'lib/client/templates/filter.html',
+    'lib/client/templates/filter.coffee',
     'lib/client/templates/checkbox.html',
     'lib/client/templates/checkbox.coffee',
     'lib/client/templates/select.html',
@@ -47,7 +54,11 @@ Package.on_use(function (api, where) {
     ]
     , 'client');
 
-  api.add_files(['lib/common/reactiveTable.coffee'], ['server','client']);
+  api.add_files(
+    [
+    'lib/common/reactiveTable.coffee',
+    'lib/common/t9n.coffee',
+    ], ['server','client']);
 
   
 });

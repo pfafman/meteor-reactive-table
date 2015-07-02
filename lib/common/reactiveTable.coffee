@@ -1,5 +1,5 @@
 
-DEBUG = false
+DEBUG = true
 
 
 class @ReactiveTable
@@ -14,16 +14,30 @@ class @ReactiveTable
   downloadFields   : null
   rowLink          : null
   tableCreateError : 'Error creating Table'
-  #newRecordText   : "New Record"
-  #methodOnInsert  : 'insertTestDataRecord'
-  #methodOnUpdate  : 'updateTestDataRecord'
-  #methodOnRemove  : 'removeTestDataRecord'
+  newRecordText    : "New Record"
+  # methodOnInsert   : 'insertTestDataRecord'
+  # methodOnUpdate   : 'updateTestDataRecord'
+  # methodOnRemove   : 'removeTestDataRecord'
   
+
+  constructor: (@options = {}) ->
+    if Meteor.isClient
+      @dict = new ReactiveDict(@_dictName())
+    @setup()
+
   
+  _dictName: ->
+    "reactiveTable_" + @_id()
+
+
+  _id: ->
+    @options.id or @collection?._name
+
+
   name: ->
     @collection?._name
 
-  
+
   countName: ->
     @name() + 'Count'
 
@@ -32,12 +46,9 @@ class @ReactiveTable
     'reactiveTable_publish_' + @name()
 
   
-  constructor: (options = {}) ->
-    @setup()
-
-
   pubSelectFilter: (select, pub) ->
     select
+
 
   # Can overwrite
   publishser: (pub, select, sort, limit, skip) =>
@@ -126,6 +137,7 @@ class @ReactiveTableInstance
 
     defaultSelect   : {}
     showFilter      : false
+    formTemplate    : 'reactiveTableForm'
     errorMessage    : ''
     cursor          : null
     
@@ -140,14 +152,45 @@ class @ReactiveTableInstance
 
     throw new Error("ReactiveTable: must specify collection") unless @collection instanceof Mongo.Collection
 
-    @_limit  = new ReactiveVar(@options.limit)
-    @_skip   = new ReactiveVar(0)
-    @_select = new ReactiveVar(@options.defaultSelect)
+    for key in ['showFilter', 'formTemplate', 'methodOnInsert', 'methodOnUpdate', 'methodOnRemove']
+      if @options?[key]?
+        @[key] = @options[key]
+      else if tableClass?[key]
+        @[key] = tableClass?[key]
+
+    @dict = tableClass.dict
+
+    @setDefault("limit", @options.limit)
+    @setDefault("skip", 0)
+    @setDefault("select", @options.defaultSelect)
+
+    @setDefault("filterColumn", null)
+    @setDefault("filterValue", '')
+    @setDefault("sortColumn", @options.sortColumn)
+    @setDefault("sortDirection", @options.sortDirection)
     
-    @filterColumn  = new ReactiveVar()
-    @filterValue   = new ReactiveVar('')
-    @sortColumn    = new ReactiveVar(@options.sortColumn)
-    @sortDirection = new ReactiveVar(@options.sortDirection)
+
+  reset: ->
+    @set("limit", @options.limit)
+    @set("skip", 0)
+    @set("select", @options.defaultSelect)
+
+    @set("filterColumn", null)
+    @set("filterValue", '')
+    @set("sortColumn", @options.sortColumn)
+    @set("sortDirection", @options.sortDirection)
+
+
+  setDefault: (key, val) ->
+    @dict.setDefault(@options?.id + key, val)
+
+
+  set: (key, val) ->
+    @dict.set(@options?.id + key, val)
+
+
+  get: (key) ->
+    @dict.get(@options?.id + key)
 
 
   publicationName: ->
@@ -156,14 +199,14 @@ class @ReactiveTableInstance
 
   sort: ->
     sort = {}
-    sort[@sortColumn.get()] = @sortDirection.get()
+    sort[@get('sortColumn')] = @get('sortDirection')
     sort
 
 
   select: ->
-    select = _.extend({}, @_select.get())
-    filterColumn = @filterColumn.get()
-    filterValue = @filterValue.get()
+    select = _.extend({}, @get('select'))
+    filterColumn = @get('filterColumn')
+    filterValue = @get('filterValue')
     col = @_cols()[filterColumn]
     if filterColumn? and filterColumn isnt "_none_"
       dataKey = col.dataKey or col.sortKey or filterColumn
@@ -181,27 +224,29 @@ class @ReactiveTableInstance
 
 
   limit: ->
-    @_limit.get()
+    @get('limit')
 
 
   skip: ->
-    @_skip.get()
+    @get('skip')
 
 
   increment: ->
     @options.limit
 
+
   pageUp: ->
-    next = @_skip.get() + @options.limit
+    next = @get('skip') + @options.limit
     if next < @recordCount()
-      @_skip.set(next)
+      @set('skip', next)
+
 
   pageDown: ->
-    next = @_skip.get() - @options.limit
+    next = @get('skip') - @options.limit
     if next > 0
-      @_skip.set(next)
+      @set('skip', next)
     else
-      @_skip.set(0)
+      @set('skip', 0)
 
 
   _cols: ->
@@ -234,9 +279,9 @@ class @ReactiveTableInstance
         colName: colName
         column: col
         noSort: col.noSort
-        sort: dataKey is @sortColumn.get()
-        desc: @sortDirection.get() is -1
-        filterOnThisCol: dataKey is @filterColumn.get()
+        sort: dataKey is @get('sortColumn')
+        desc: @get('sortDirection') is -1
+        filterOnThisCol: dataKey is @get('filterColumn')
         canFilterOn: canFilterOn
         hide: col.hide?()
     console.log("headers", rtn) if DEBUG
@@ -294,33 +339,97 @@ class @ReactiveTableInstance
     recordsData
 
 
-  setSort: (dataKey) ->
-    if dataKey is @sortColumn.get()
-      @sortDirection.set(-@sortDirection.get())
+  formData: (type, id = null) ->
+    if type is 'edit' and id?
+      record = @collection.findOne(id)
     else
-      @sortColumn.set(dataKey)
-      @sortDirection.set(@options.sortDirection)
-    @_skip.set(0)
+      record = null
+
+    if @extraFormData?
+      _.extend(record, @extraFormData(type))
+
+    if @formTemplate is 'reactiveTableForm'
+      recordData = []
+
+      for key, col of @_cols()
+        dataKey = col.dataKey or col.sortKey or key
+        localCol = _.clone(col)
+        if col[type]?(record) or (col[type] is true) or col["staticOn_#{type}"] or col["hiddenOn_#{type}"]
+          if col["hiddenOn_#{type}"]
+            col.type = 'hidden'
+          if not col.type?
+            col.type = 'text'
+          localCol.displayType = col.type
+          localCol.checkbox = false
+          localCol.checked = false
+          value = @valueFromRecord(key, col, record)
+          if col.type is 'boolean'
+            localCol.displayType = 'checkbox'
+            localCol.checkbox = true
+            if record?[dataKey]?
+              if record[dataKey]
+                localCol.checked = true
+            else if col.default
+              localCol.checked = true
+          else if value?
+            localCol.value = value
+          else if col.default?
+            localCol.value = col.default
+
+          localCol.realValue = value
+
+          if col["staticOn_#{type}"]
+            localCol.static = true
+            localCol.value = value
+            if col?.valueFunc?
+              localCol.realValue = record[key]
+
+          if col["hiddenOn_#{type}"]
+            localCol.hidden = true
+            localCol.value = value
+            if col?.valueFunc?
+              localCol.realValue = record[key]
+
+          localCol.header = (col.header or key).capitalize()
+          localCol.key = key
+          localCol.dataKey = dataKey
+
+          recordData.push localCol
+      columns: recordData
+    else
+      record
+
+
+  setSort: (dataKey) ->
+    if dataKey is @get('sortColumn')
+      @set('sortDirection', -@get('sortDirection'))
+    else
+      @set('sortColumn', dataKey)
+      @set('sortDirection', @options.sortDirection)
+    @set('skip', 0)
 
 
   setFilterColumn: (col) ->
-    if @filterColumn.get() isnt col
-      @filterColumn.set(col)
-      @filterValue.set('')
-      @_skip.set(0)
+    if @get('filterColumn') isnt col
+      @set('filterColumn', col)
+      @set('filterValue', '')
+      @set('skip', 0)
       
 
 
   setFilterValue: (value) ->
     console.log("setFilterValue", value) if DEBUG
-    if @filterValue.get() isnt value
-      @filterValue.set(value)
-      @skip.set(0)
+    if @get('filterValue') isnt value
+      @set('filterValue', value)
+      @set('skip', 0)
       
 
+  filterValue: ->
+    @get('filterValue')
 
-  getSelectedFilterType: ->
-    filterColumn = @filterColumn.get()
+    
+  filterType: ->
+    filterColumn = @get('filterColumn')
     if filterColumn?
       switch (@_cols()?[filterColumn]?.type)
         when 'boolean'
@@ -357,7 +466,95 @@ class @ReactiveTableInstance
   colToUseForName: ->
     @options.colToUseForName or '_id'
   
-
   
+  editRecordTitle: ->
+    T9n.get('Edit') + ' ' + @recordName().capitalize()
+
+
+  editRecord: (_id) ->
+    @_sess("currentRecordId", _id)
+    MaterializeModal.form
+      bodyTemplate: @formTemplate
+      title: @editRecordTitle()
+      columns: @formData('edit', _id).columns
+      callback: @updateRecord
+      fullscreen: Meteor.isCordova
+      fixedFooter: true
+
+
+  updateRecord: (yesNo, rec) =>
+    @errorMessage = ''
+    if yesNo
+      rec = {} unless rec
+      rec._id = @_sess("currentRecordId") unless rec._id?
+      if @collection().editOk(rec)
+        @updateThisRecord(@_sess("currentRecordId"), rec)
+
+
+  updateThisRecord: (recId, rec, type="update") =>
+    console.log("updateThisRecord", recId, rec)
+    if @checkFields(rec, type)
+      if @collection().methodOnUpdate
+        Meteor.call @collection().methodOnUpdate, recId, rec, (error) =>
+          if error
+            console.log("Error updating " + @_recordName(), error)
+            Materialize.toast("Error updating " + @_recordName() + " : #{error.reason}", 3000, 'red')
+          else if type isnt "inlineUpdate"
+            Materialize.toast(@_recordName() + " saved", 3000, 'green')
+            @fetchRecordCount()
+      else
+        delete rec._id
+        @collection().update recId,
+          $set: rec
+        , (error, effectedCount) =>
+          if error
+            console.log("Error updating " + @_recordName(), error)
+            Materialize.toast("Error updating " + @_recordName() + " : #{error.reason}", 3000, 'red')
+          else
+            if type isnt "inlineUpdate"
+              Materialize.toast(@_recordName() + " updated", 3000, 'green')
+            @fetchRecordCount()
+    else
+      Materialize.toast("Error could not update " + @_recordName() + " " + @errorMessage, 3000, 'red')
+
+
+  newRecord: ->
+    if @newRecordRoute?
+      Router.go(@newRecordPath)  # Should already be handled
+    else
+      console.log("formData", @formTemplate, @formData('insert')) if DEBUG
+      MaterializeModal.form
+        bodyTemplate: @formTemplate
+        title: 'New ' + @recordsName().capitalize()
+        columns: @formData('insert').columns
+        callback: @insertRecord
+        fullscreen: Meteor.isCordova
+        fixedFooter: true
+  
+
+  insertRecord: (yesNo, rec) =>
+    @errorMessage = ''
+    if yesNo
+      if @collection.insertOk(rec) and @checkFields(rec, 'insert')
+        if @collection.methodOnInsert
+          Meteor.call @collection().methodOnInsert, rec, (error) =>
+            if error
+              console.log("Error saving " + @_recordName(), error)
+              Materialize.toast("Error saving " + @_recordName() + " : #{error.reason}", 3000, 'red')
+            else
+              Materialize.toast(@_recordName() + " created", 3000, 'green')
+              @fetchRecordCount()
+              @newRecordCallback?(rec)
+        else
+          @collection().insert rec, (error, effectedCount) =>
+            if error
+              console.log("Error saving " + @_recordName(), error)
+              Materialize.toast("Error saving " + @_recordName() + " : #{error.reason}", 3000, 'red')
+            else
+              Materialize.toast(@_recordName() + " created", 3000, 'green')
+              @fetchRecordCount()
+              @newRecordCallback?(effectedCount)
+      else
+        Materialize.toast("Error could not save " + @_recordName() + " " + @errorMessage, 3000, 'red')
 
 

@@ -1,23 +1,23 @@
 
-DEBUG = false
-
-Template.registerHelper 'capitalize', (str) ->
-  str?.charAt?(0).toUpperCase() + str?.slice?(1)
-
-# Capitalize first letter in string
-String::capitalize = ->
-  @charAt(0).toUpperCase() + @slice(1)
+DEBUG = true
 
 
+#########################
+# reactiveTable template
+#
 
 Template.reactiveTable.onCreated ->
   console.log('reactiveTable onCreated', @data) if DEBUG
   table = @data
+
+  @firstReady = new ReactiveVar(false)
   
   if table?.publicationName?()?
     @autorun =>
       console.log("subscribe", table.publicationName?()) if DEBUG
-      @subscribe(table.publicationName(), table.select(), table.sort(), table.limit(), table.skip())
+      @subscribe table.publicationName(), table.select(), table.sort(), table.limit(), table.skip(), =>
+        @firstReady.set(true)
+
       
 
 Template.reactiveTable.onRendered ->
@@ -25,23 +25,37 @@ Template.reactiveTable.onRendered ->
 
 
 Template.reactiveTable.helpers
+
+  firstReady: ->
+    Template.instance().firstReady.get()
+
+
   haveTable: ->
     @ instanceof ReactiveTableInstance
+
 
   haveData: ->
     console.log("haveData", @recordCount()) if DEBUG
     @recordCount() > 0
 
+
   style: ->
     @options.style
+
 
   moreTableClasses: ->
     if @options.rowLink?
       "hoverable rowlink"
 
+
   noRecordsText: ->
     @options.noRecordsText or "No #{@recordsName().capitalize()}"
 
+
+
+############################
+# reactiveTableNav template
+#
 
 Template.reactiveTableNav.helpers
   
@@ -54,19 +68,24 @@ Template.reactiveTableNav.helpers
 
   
   pageDownDisable: ->
-    @skip()is 0
+    @skip() is 0
+
       
   showNavCount: ->
     @recordCount() > @increment()
+
   
   pageUpDisable: ->
     @skip() + @increment() > @recordCount()
 
+
   recordCountStart: ->
     @skip() + 1
 
+
   recordCountEnd: ->
     Math.min(@skip() + @limit(), @recordCount())
+
 
   recordCountDisplay: ->
     @recordCount() + " " + @recordsName()
@@ -85,8 +104,14 @@ Template.reactiveTableNav.events
     @pageDown()
 
 
+
+################################
+# reactiveTableHeading template
+#
+
 Template.reactiveTableHeading.onRendered ->
   console.log("reactiveTableHeading onRendered", @data) if DEBUG
+
 
 Template.reactiveTableHeading.helpers
   
@@ -97,6 +122,16 @@ Template.reactiveTableHeading.helpers
   newRecordButtonText: ->
     @options.newRecordButtonText or "New " + @recordName()
 
+
+Template.reactiveTableHeading.events
+  'click #reactive-table-new-record': (event, tmpl) ->
+    console.log("New Record") if DEBUG
+    @newRecord()
+
+
+################################
+# reactiveTableHeader template
+#
 
 Template.reactiveTableHeader.helpers
   # headers: ->
@@ -116,10 +151,20 @@ Template.reactiveTableHeader.events
     Template.parentData(1).setSort(@dataKey)
 
 
+
+################################
+# reactiveTableBody template
+#
+
 Template.reactiveTableBody.helpers
   records: ->
     @recordsData()
 
+
+
+################################
+# reactiveTableRow template
+#
 
 Template.reactiveTableRow.onRendered ->
   @$('.modal-trigger').leanModal()
