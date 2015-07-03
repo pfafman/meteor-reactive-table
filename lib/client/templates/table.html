@@ -180,7 +180,7 @@
 
     {{#if ../options.extraControls}}{{> Template.dynamic template=../options.extraControls}}{{/if}}
 
-    {{#if editOk}}
+    {{#if updateOk}}
         <a href="{{#if ../options.editRoute}}{{pathFor ../options.editRoute}}{{/if}}" 
           class="{{../options.editClass}} reactive-table-edit-record tooltipped"
           data-tooltip='Edit Record' rel='tooltip'>
@@ -188,7 +188,7 @@
         </a>
     {{/if}}
 
-    {{#if deleteOk}}
+    {{#if removeOk}}
         <a class="{{../options.deleteClass}} reactive-table-delete-record" data-tooltip='Delete Record' rel='tooltip'>
             <i class="mdi-action-delete"></i>
         </a>

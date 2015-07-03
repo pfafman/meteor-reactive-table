@@ -10,5 +10,7 @@ en =
   'Sort On': 'Sort On'
   'TRUE': 'TRUE'
   'save': 'save'
+  'edit': 'edit'
+  
 
 T9n.map "en", en

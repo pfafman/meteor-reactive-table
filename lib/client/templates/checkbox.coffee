@@ -1,3 +1,4 @@
+DEBUG = false
 
 
 Template.reactiveTableCheckbox.onCreated ->

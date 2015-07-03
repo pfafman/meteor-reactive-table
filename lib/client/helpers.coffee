@@ -1,5 +1,5 @@
-DEBUG = false
 
+DEBUG = false
 
 
 t9nIt = (string) ->

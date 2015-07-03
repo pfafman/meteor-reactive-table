@@ -1,6 +1,6 @@
 
-
 DEBUG = false
+
 
 Template.reactiveTableFilter.onCreated ->
   # ...

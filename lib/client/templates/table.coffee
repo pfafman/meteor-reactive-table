@@ -120,13 +120,13 @@ Template.reactiveTableHeading.helpers
 
 
   newRecordButtonText: ->
-    @options.newRecordButtonText or "New " + @recordName()
+    @options.newRecordText or "New " + @recordName()
 
 
 Template.reactiveTableHeading.events
   'click #reactive-table-new-record': (event, tmpl) ->
     console.log("New Record") if DEBUG
-    @newRecord()
+    @onInsertRecord()
 
 
 ################################
@@ -184,11 +184,13 @@ Template.reactiveTableRow.events
 
   'click .reactive-table-delete-record': (event, tmpl) ->
     console.log("delete", @,  Template.parentData(1)) if DEBUG
-    Template.parentData(1).options?.onDelete?(@) or Template.parentData(1).onDelete?(@)
+    #Template.parentData(1).options?.onDelete?(@) or Template.parentData(1).onDelete?(@)
+    Template.parentData(1).onRemoveRecord?(@)
 
 
   'click .reactive-table-edit-record': (event, tmpl) ->
     console.log("edit: TODO: Enable Modal Edit?", @,  Template.parentData(1)) if DEBUG
-    Template.parentData(1).options?.onEdit?(@) or Template.parentData(1).onEdit?(@)
+    #Template.parentData(1).options?.onEdit?(@) or Template.parentData(1).onEdit?(@)
+    Template.parentData(1).onUpdateRecord?(@)
 
 

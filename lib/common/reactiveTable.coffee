@@ -14,7 +14,6 @@ class @ReactiveTable
   downloadFields   : null
   rowLink          : null
   tableCreateError : 'Error creating Table'
-  newRecordText    : "New Record"
   # methodOnInsert   : 'insertTestDataRecord'
   # methodOnUpdate   : 'updateTestDataRecord'
   # methodOnRemove   : 'removeTestDataRecord'
@@ -114,13 +113,13 @@ class @ReactiveTable
   insertOk: (record)->
     false
 
-  deleteAllOk: ->
+  updateOk: (record) ->
     false
 
-  deleteOk: (record) ->
+  removeAllOk: ->
     false
 
-  editOk: (record) ->
+  removeOk: (record) ->
     false
 
 
@@ -129,7 +128,7 @@ class @ReactiveTableInstance
   classID: 'ReactiveTableInstance'
 
   defaults:
-    recordName: 'record'
+    recordName      : 'Record'
     colToUseForName : '_id'
     limit           : 10
     sortColumn      : '_id'
@@ -152,11 +151,13 @@ class @ReactiveTableInstance
 
     throw new Error("ReactiveTable: must specify collection") unless @collection instanceof Mongo.Collection
 
-    for key in ['showFilter', 'formTemplate', 'methodOnInsert', 'methodOnUpdate', 'methodOnRemove']
+    for key in ['showFilter', 'formTemplate', 'methodOnInsert', 'methodOnUpdate', 'methodOnRemove', 'updateOk', 'insertOk', 'removeOk', 'removeAllOk']
       if @options?[key]?
         @[key] = @options[key]
       else if tableClass?[key]
-        @[key] = tableClass?[key]
+        @[key] = tableClass[key]
+      else if @collection?[key]
+        @[key] = @collection[key]
 
     @dict = tableClass.dict
 
@@ -332,15 +333,15 @@ class @ReactiveTableInstance
         _id: record._id
         recordName: record[@colToUseForName()]
         recordDisplayName: @recordName() + ' ' + record[@colToUseForName()]
-        editOk: @options.editOk(record)
-        deleteOk: @options.deleteOk(record)
+        updateOk: @updateOk(record)
+        removeOk: @removeOk(record)
         #extraControls: @extraControls?(record)
     
     recordsData
 
 
   formData: (type, id = null) ->
-    if type is 'edit' and id?
+    if type is 'update' and id?
       record = @collection.findOne(id)
     else
       record = null
@@ -456,7 +457,7 @@ class @ReactiveTableInstance
 
 
   recordName: ->
-    @options.recordName or @name()
+    @options.recordName
 
 
   recordsName: ->
@@ -467,94 +468,141 @@ class @ReactiveTableInstance
     @options.colToUseForName or '_id'
   
   
-  editRecordTitle: ->
-    T9n.get('Edit') + ' ' + @recordName().capitalize()
+  # CRUD
+
+  checkFields: (rec, type="insert") ->
+    @errorMessage = ''
+    for key, col of @_cols()
+      try
+        console.log("checkFields", type, key, col, col[type]) if DEBUG
+        if key isnt '_id' and (not col[type] or col["staticOn_#{type}"])
+          delete rec[key]
+        else
+          dataKey = col.dataKey or col.sortKey or key
+          console.log("checkFields", dataKey, rec[dataKey], col) if DEBUG
+          if type isnt "inlineUpdate" and col.required and (not rec[dataKey]? or rec[dataKey] is '')
+            col.header = (col.header || key).capitalize()
+            @errorMessage = ':' + "#{col.header} is required"
+            return false
+          else if type is 'insert' and col.onInsert?
+            rec[dataKey] = col.onInsert()
+          else if type in ['update', 'inlineUpdate'] and col.onUpdate?
+            rec[dataKey] = col.onUpdate()
+      catch error
+        @errorMessage = ':' + error.reason or error
+        return false
+    true
 
 
-  editRecord: (_id) ->
-    @_sess("currentRecordId", _id)
-    MaterializeModal.form
-      bodyTemplate: @formTemplate
-      title: @editRecordTitle()
-      columns: @formData('edit', _id).columns
-      callback: @updateRecord
-      fullscreen: Meteor.isCordova
-      fixedFooter: true
+  onInsertRecord: ->
+    if @options.onInsertRecord?  and typeof options.onInsertRecord is 'function'
+      @options.onInsertRecord()
+    else
+      if @newRecordRoute?
+        Router.go(@newRecordPath)  # Should already be handled
+      else
+        console.log("formData", @formTemplate, @formData('insert')) if DEBUG
+        MaterializeModal.form
+          bodyTemplate: @formTemplate
+          title: 'New ' + @recordsName().capitalize()
+          columns: @formData('insert').columns
+          callback: @insertRecord
+          fullscreen: Meteor.isCordova
+          fixedFooter: true
+  
+
+  insertRecord: (yesNo, rec) =>
+    @errorMessage = ''
+    if yesNo
+      console.log("insertRecord", @methodOnInsert, rec) if DEBUG
+      if @insertOk(rec) and @checkFields(rec, 'insert')
+        if @methodOnInsert
+          Meteor.call @methodOnInsert, rec, (error, rtn) =>
+            if error
+              console.log("Error saving " + @recordName(), error)
+              Materialize.toast("Error saving " + @recordName() + " : #{error.reason}", 3000, 'red')
+            else
+              Materialize.toast(@recordName() + " created", 3000, 'green')
+              @insertRecordCallback?(rtn or rec)
+        else
+          @collection.insert rec, (error, effectedCount) =>
+            if error
+              console.log("Error saving " + @recordName(), error)
+              Materialize.toast("Error saving " + @recordName() + " : #{error.reason}", 3000, 'red')
+            else
+              Materialize.toast(@recordName() + " created", 3000, 'green')
+              @insertRecordCallback?(rec)
+      else
+        Materialize.toast("Error could not save " + @recordName() + " " + @errorMessage, 3000, 'red')
+
+
+  updateRecordTitle: ->
+    T9n.get('edit').capitalize() + ' ' + @recordName().capitalize()
+
+
+  onUpdateRecord: (rec) ->
+    @currentRecordId = rec._id
+    if @options.onUpdateRecord? and typeof options.onUpdateRecord is 'function'
+      @options.onUpdateRecord(rec)
+    else
+      MaterializeModal.form
+        bodyTemplate: @formTemplate
+        title: @updateRecordTitle()
+        columns: @formData('update', @currentRecordId).columns
+        callback: @updateRecord
+        fullscreen: Meteor.isCordova
+        fixedFooter: true
 
 
   updateRecord: (yesNo, rec) =>
     @errorMessage = ''
     if yesNo
       rec = {} unless rec
-      rec._id = @_sess("currentRecordId") unless rec._id?
-      if @collection().editOk(rec)
-        @updateThisRecord(@_sess("currentRecordId"), rec)
+      rec._id = @currentRecordId unless rec._id?
+      if @updateOk(rec)
+        @updateThisRecord(@currentRecordId, rec)
+    @currentRecordId = null
 
 
   updateThisRecord: (recId, rec, type="update") =>
-    console.log("updateThisRecord", recId, rec)
+    console.log("updateThisRecord", recId, rec) if DEBUG
     if @checkFields(rec, type)
-      if @collection().methodOnUpdate
-        Meteor.call @collection().methodOnUpdate, recId, rec, (error) =>
+      if @methodOnUpdate
+        Meteor.call @methodOnUpdate, recId, rec, (error, rtn) =>
           if error
-            console.log("Error updating " + @_recordName(), error)
-            Materialize.toast("Error updating " + @_recordName() + " : #{error.reason}", 3000, 'red')
+            console.log("Error updating " + @recordName(), error)
+            Materialize.toast("Error updating " + @recordName() + " : #{error.reason}", 3000, 'red')
           else if type isnt "inlineUpdate"
-            Materialize.toast(@_recordName() + " saved", 3000, 'green')
-            @fetchRecordCount()
+            Materialize.toast(@recordName() + " saved", 3000, 'green')
+            @updateRecordCallback?(rtn or rec)
       else
         delete rec._id
-        @collection().update recId,
+        @collection.update recId,
           $set: rec
         , (error, effectedCount) =>
           if error
-            console.log("Error updating " + @_recordName(), error)
-            Materialize.toast("Error updating " + @_recordName() + " : #{error.reason}", 3000, 'red')
+            console.log("Error updating " + @recordName(), error)
+            Materialize.toast("Error updating " + @recordName() + " : #{error.reason}", 3000, 'red')
           else
             if type isnt "inlineUpdate"
-              Materialize.toast(@_recordName() + " updated", 3000, 'green')
-            @fetchRecordCount()
+              Materialize.toast(@recordName() + " updated", 3000, 'green')
+              @updateRecordCallback?(rec)
     else
-      Materialize.toast("Error could not update " + @_recordName() + " " + @errorMessage, 3000, 'red')
+      Materialize.toast("Error could not update " + @recordName() + " " + @errorMessage, 3000, 'red')
 
 
-  newRecord: ->
-    if @newRecordRoute?
-      Router.go(@newRecordPath)  # Should already be handled
+  onRemoveRecord: (rec) ->
+    if @options.onRemoveRecord?  and typeof options.onRemoveRecord is 'function'
+      @options.onRemoveRecord(rec)
     else
-      console.log("formData", @formTemplate, @formData('insert')) if DEBUG
-      MaterializeModal.form
-        bodyTemplate: @formTemplate
-        title: 'New ' + @recordsName().capitalize()
-        columns: @formData('insert').columns
-        callback: @insertRecord
-        fullscreen: Meteor.isCordova
-        fixedFooter: true
-  
-
-  insertRecord: (yesNo, rec) =>
-    @errorMessage = ''
-    if yesNo
-      if @collection.insertOk(rec) and @checkFields(rec, 'insert')
-        if @collection.methodOnInsert
-          Meteor.call @collection().methodOnInsert, rec, (error) =>
-            if error
-              console.log("Error saving " + @_recordName(), error)
-              Materialize.toast("Error saving " + @_recordName() + " : #{error.reason}", 3000, 'red')
-            else
-              Materialize.toast(@_recordName() + " created", 3000, 'green')
-              @fetchRecordCount()
-              @newRecordCallback?(rec)
-        else
-          @collection().insert rec, (error, effectedCount) =>
-            if error
-              console.log("Error saving " + @_recordName(), error)
-              Materialize.toast("Error saving " + @_recordName() + " : #{error.reason}", 3000, 'red')
-            else
-              Materialize.toast(@_recordName() + " created", 3000, 'green')
-              @fetchRecordCount()
-              @newRecordCallback?(effectedCount)
-      else
-        Materialize.toast("Error could not save " + @_recordName() + " " + @errorMessage, 3000, 'red')
+      MaterializeModal.confirm
+        title: 'Delete Record'
+        message: "Are you sure you want to delete record <i>#{rec.recordName}</i>?"
+        callback: (yesNo) ->
+          if yesNo
+            Meteor.call 'removeTestDataRecord', rec._id, (error, result) ->
+              if error
+                Materialize.toast("Error on delete: #{error.reason}", 4000, 'red')
+                @removeRecordCallback?()
 
 

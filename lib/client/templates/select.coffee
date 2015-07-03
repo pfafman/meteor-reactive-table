@@ -1,4 +1,6 @@
 
+DEBUG = false
+
 Template.reactiveTableSelect.onCreated ->
   @active = new ReactiveVar(false)
 

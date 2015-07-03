@@ -25,6 +25,7 @@
   <div class="{{#if static}}static-{{/if}}input-field">
     
     {{#if DO_NOT_DO_static}}
+      <!-- Note: I have had issues with passing static.  Remove the field on update -->
       <input type="hidden" name="{{key}}" value="{{realValue}}" />
     {{/if}}
     
