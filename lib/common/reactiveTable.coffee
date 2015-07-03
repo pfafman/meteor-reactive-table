@@ -1,5 +1,5 @@
 
-DEBUG = true
+DEBUG = false
 
 
 class @ReactiveTable
@@ -22,6 +22,11 @@ class @ReactiveTable
   constructor: (@options = {}) ->
     if Meteor.isClient
       @dict = new ReactiveDict(@_dictName())
+    
+    for key in ['methodOnInsert', 'methodOnUpdate', 'methodOnRemove', 'updateOk', 'insertOk', 'removeOk', 'removeAllOk']
+      if @options?[key]?
+        @[key] = @options[key]
+
     @setup()
 
   
@@ -34,7 +39,7 @@ class @ReactiveTable
 
 
   name: ->
-    @collection?._name
+    @_id()
 
 
   countName: ->
@@ -595,12 +600,16 @@ class @ReactiveTableInstance
     if @options.onRemoveRecord?  and typeof options.onRemoveRecord is 'function'
       @options.onRemoveRecord(rec)
     else
+      if rec.recordName?
+        recName = " <i>#{rec.recordName}</i>?"
+      else
+        recName = "?"
       MaterializeModal.confirm
-        title: 'Delete Record'
-        message: "Are you sure you want to delete record <i>#{rec.recordName}</i>?"
-        callback: (yesNo) ->
+        title: "Delete #{@recordName()}"
+        message: "Are you sure you want to delete #{@recordName()}#{recName}"
+        callback: (yesNo) =>
           if yesNo
-            Meteor.call 'removeTestDataRecord', rec._id, (error, result) ->
+            Meteor.call @methodOnRemove, rec._id, (error, result) ->
               if error
                 Materialize.toast("Error on delete: #{error.reason}", 4000, 'red')
                 @removeRecordCallback?()
