@@ -124,9 +124,28 @@ Template.reactiveTableHeading.helpers
 
 
 Template.reactiveTableHeading.events
-  'click #reactive-table-new-record': (event, tmpl) ->
+  
+  'click #new-record': (event, tmpl) ->
     console.log("New Record") if DEBUG
     @onInsertRecord()
+
+
+  'click #download-records': (event, tmpl) ->
+    console.log("Download Records") #if DEBUG
+
+    filename = @tableTitle + '.csv'
+    @downloadRecords (error, csv) ->
+      if error
+        Materialize.toast("Error getting CSV to download", 3000, 'red')
+        console.log("Error getting CSV", error)
+      else if csv
+        console.log("Doing saveAs for CSV") if DEBUG
+        blob = new Blob [csv],
+          type: "text/csv"
+        saveAs?(blob, filename)
+        Materialize.toast("Records Downloaded", 3000, 'green')
+      else
+        Materialize.toast("No data to download", 3000, 'red')
 
 
 ################################
@@ -140,9 +159,9 @@ Template.reactiveTableHeader.helpers
 
   sortArrow: ->
     if @desc
-      @upArrow or "&#8593;"
+      @upArrow or "<i class='material-icons caret'>&#xE5C5;</i>"  #  (&#9650;) and ▼ (&#9660;)
     else
-      @downArrow or "&#8595;"
+      @downArrow or "<i class='material-icons caret'>&#xE5C7;</i>"
 
 
 Template.reactiveTableHeader.events

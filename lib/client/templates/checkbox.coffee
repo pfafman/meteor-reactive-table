@@ -10,11 +10,11 @@ Template.reactiveTableCheckbox.helpers
     @column?.contenteditable #and Template.instance().active?.get()
 
   checkedMark: ->
-    @column?.checkedMark or 'fa-check-square-o'
+    @column?.checkedMark or 'done'
 
   notCheckMark: ->
     if not @column?.blankOnNotChecked
-      @column?.notCheckMark or 'fa-square-o'
+      @column?.notCheckMark or 'check_box_outline_blank'
 
 
 Template.reactiveTableCheckbox.events

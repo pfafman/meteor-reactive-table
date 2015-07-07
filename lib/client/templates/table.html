@@ -51,7 +51,7 @@
     {{#if options.tableTitle}}
       <h4 class="truncate col l4 m4 s12 {{#if options.showTitleLargeOnly}}hide-on-med-and-down{{/if}}">
         {{#if options.showBackButton}}
-          <a class="back-btn" onclick="window.history.back()"><i class="mdi-navigation-chevron-left"></i></a>
+          <a class="back-btn" onclick="window.history.back()"><i class="material-icons">keyboard_arrow_left</i></a>
         {{/if}}
 
         {{{options.tableTitle}}}
@@ -67,20 +67,20 @@
       {{/if}}
 
       {{#if options.doDownloadLink}}
-        <button id="download-link" class="btn {{options.downloadButtonColor}} waves-effect waves-light">
-          Download<i class="mdi-file-cloud-download right "></i> 
+        <button id="download-records" class="btn {{options.downloadButtonColor}} waves-effect waves-light">
+          Download<i class="material-icons">cloud_download</i> 
         </button>
       {{/if}}
 
       {{#if showNewButton}}
         {{#if options.newRecordRoute}}
           <a class="btn {{options.newButtonClass}} waves-effect waves-light" href="{{pathFor options.newRecordRoute}}">
-            <i class="mdi-content-add-circle left"></i>
+            <i class="material-icons left">add_circle</i>
             {{newRecordButtonText}}
           </a>
         {{else}}
-          <button id="reactive-table-new-record" class="btn {{options.newButtonColor}} waves-effect waves-light">
-            <i class="mdi-content-add-circle left"></i>
+          <button id="new-record" class="btn {{options.newButtonColor}} waves-effect waves-light">
+            <i class="material-icons left">add_circle</i>
             {{newRecordButtonText}}
           </button>
         {{/if}}
@@ -107,6 +107,7 @@
 
 </template>
 
+
 <template name="reactiveTableHead">
   {{#each headers}}
     {{#unless hide}}
@@ -115,6 +116,7 @@
   {{/each}}
   <th class="controls-header"> </th>
 </template>
+
 
 <template name="reactiveTableHeader">
   <th class="{{column.class}}">
@@ -175,7 +177,7 @@
         data-position="left"
         rel='tooltip'
         href="#modal-json-{{_id}}"
-      ><i class="mdi-action-description"></i></a>
+      ><i class="material-icons">code</i></a>
     {{/if}}
 
     {{#if ../options.extraControls}}{{> Template.dynamic template=../options.extraControls}}{{/if}}
@@ -184,13 +186,13 @@
         <a href="{{#if ../options.editRoute}}{{pathFor ../options.editRoute}}{{/if}}" 
           class="{{../options.editClass}} reactive-table-edit-record tooltipped"
           data-tooltip='Edit Record' rel='tooltip'>
-          <i class="mdi-editor-mode-edit"></i>
+          <i class="material-icons">mode_edit</i>
         </a>
     {{/if}}
 
     {{#if removeOk}}
         <a class="{{../options.deleteClass}} reactive-table-delete-record" data-tooltip='Delete Record' rel='tooltip'>
-          <i class="mdi-action-delete"></i>
+          <i class="material-icons">delete</i>
         </a>
     {{/if}}
 

@@ -1,5 +1,5 @@
 
-DEBUG = false
+DEBUG = true
 
 
 class @ReactiveTable
@@ -150,6 +150,8 @@ class @ReactiveTableInstance
 
   constructor: (tableClass, options = {}) ->
     @collection = tableClass.collection
+    @name = tableClass.name()
+    
     console.log("ReactiveTable constructor", @, @collection) if DEBUG
 
     @options = _.defaults(options, _.omit(tableClass, ['setUp', 'newTable']), @defaults)
@@ -513,7 +515,7 @@ class @ReactiveTableInstance
           columns: @formData('insert').columns
           callback: @insertRecord
           fullscreen: Meteor.isCordova
-          fixedFooter: true
+          #fixedFooter: true
   
 
   insertRecord: (yesNo, rec) =>
@@ -556,7 +558,7 @@ class @ReactiveTableInstance
         columns: @formData('update', @currentRecordId).columns
         callback: @updateRecord
         fullscreen: Meteor.isCordova
-        fixedFooter: true
+        #fixedFooter: true
 
 
   updateRecord: (yesNo, rec) =>
@@ -615,3 +617,13 @@ class @ReactiveTableInstance
                 @removeRecordCallback?()
 
 
+  downloadRecords: (callback) ->
+    fields = {}
+    if @downloadFields?
+      fields = @downloadFields
+    else
+      for key, col of @_cols()
+        dataKey = col.dataKey or col.sortKey or key
+        fields[dataKey] = 1
+
+    Meteor.call "reactiveTable_" + @name + "_getCSV", @select(), fields, callback

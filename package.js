@@ -15,7 +15,8 @@ Package.on_use(function (api, where) {
     'templating',
     //'reactive-var',
     'reactive-dict',
-    'less'
+    'less',
+    'pfafman:filesaver',
     ]
     , 'client');
 
