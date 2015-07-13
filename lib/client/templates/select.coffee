@@ -27,14 +27,26 @@ Template.reactiveTableOptions.helpers
           val: @placeholder
           disabled: 'disabled'
           
-      if _.isArray(@select)
-        for elm in @select
-          rtn.push
-            key: elm
-            val: elm
-            selected: if @value is elm then 'selected'
-      else if _.isObject(@select)
-        for key, val of @select
+      if _.isFunction(@select)
+        select = @select()
+      else
+        select = @select
+
+      console.log("select:", select, @select) if DEBUG
+      if _.isArray(select)
+        for elm in select
+          if _.isObject(elm)
+            rtn.push
+              key: elm.key
+              val: elm.val
+              selected: if @value is elm.val then 'selected'
+          else
+            rtn.push
+              key: elm
+              val: elm
+              selected: if @value is elm then 'selected'
+      else if _.isObject(select)
+        for key, val of select
           rtn.push
             key: key
             val: val

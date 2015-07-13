@@ -116,7 +116,7 @@ Template.reactiveTableHeading.onRendered ->
 Template.reactiveTableHeading.helpers
   
   showNewButton: ->
-    @options.newRecordRoute or @options.showNewButton
+    @insertOk() and (@options.newRecordRoute or @options.showNewButton)
 
 
   newRecordButtonText: ->
@@ -136,16 +136,16 @@ Template.reactiveTableHeading.events
     filename = @tableTitle + '.csv'
     @downloadRecords (error, csv) ->
       if error
-        Materialize.toast("Error getting CSV to download", 3000, 'red')
+        Materialize.toast("Error getting CSV to download", 3000, 'toast-error')
         console.log("Error getting CSV", error)
       else if csv
         console.log("Doing saveAs for CSV") if DEBUG
         blob = new Blob [csv],
           type: "text/csv"
         saveAs?(blob, filename)
-        Materialize.toast("Records Downloaded", 3000, 'green')
+        Materialize.toast("Records Downloaded", 3000, 'toast-success')
       else
-        Materialize.toast("No data to download", 3000, 'red')
+        Materialize.toast("No data to download", 3000, 'toast-error')
 
 
 ################################

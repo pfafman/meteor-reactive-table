@@ -158,7 +158,21 @@ class @ReactiveTableInstance
 
     throw new Error("ReactiveTable: must specify collection") unless @collection instanceof Mongo.Collection
 
-    for key in ['showFilter', 'formTemplate', 'methodOnInsert', 'methodOnUpdate', 'methodOnRemove', 'updateOk', 'insertOk', 'removeOk', 'removeAllOk']
+    optionKeys = [
+      'showFilter'
+      'formTemplate'
+      'methodOnInsert'
+      'methodOnUpdate'
+      'methodOnRemove'
+      'updateOk'
+      'insertOk'
+      'removeOk'
+      'removeAllOk'
+      'tableClass'
+      'newRecordText'
+    ]
+
+    for key in optionKeys
       if @options?[key]?
         @[key] = @options[key]
       else if tableClass?[key]
@@ -168,15 +182,18 @@ class @ReactiveTableInstance
 
     @dict = tableClass.dict
 
-    @setDefault("limit", @options.limit)
-    @setDefault("skip", 0)
-    @setDefault("select", @options.defaultSelect)
+    if Router.current().params?.query?.back
+      @setDefault("limit", @options.limit)
+      @setDefault("skip", 0)
+      @setDefault("select", @options.defaultSelect)
 
-    @setDefault("filterColumn", null)
-    @setDefault("filterValue", '')
-    @setDefault("sortColumn", @options.sortColumn)
-    @setDefault("sortDirection", @options.sortDirection)
-    
+      @setDefault("filterColumn", null)
+      @setDefault("filterValue", '')
+      @setDefault("sortColumn", @options.sortColumn)
+      @setDefault("sortDirection", @options.sortDirection)
+    else
+      @reset()
+
 
   reset: ->
     @set("limit", @options.limit)
@@ -258,7 +275,7 @@ class @ReactiveTableInstance
 
 
   _cols: ->
-    theColumns = @options.schema or @collection?.schema
+    theColumns = @options.schema or @schema or @collection?.schema
     if theColumns instanceof Array
       colObj = {}
       for col in theColumns
@@ -291,7 +308,7 @@ class @ReactiveTableInstance
         desc: @get('sortDirection') is -1
         filterOnThisCol: dataKey is @get('filterColumn')
         canFilterOn: canFilterOn
-        hide: col.hide?()
+        hide: col.hide?() or col.hide
     console.log("headers", rtn) if DEBUG
     rtn
 
@@ -315,7 +332,7 @@ class @ReactiveTableInstance
       colData = []
       for key, col of cols
         dataKey = col.dataKey or col.sortKey or key
-        if not col.hide?()
+        if not (col.hide?() or col.hide)
           value = @valueFromRecord(key, col, record)
           if col.display?
             value = col.display(value, record)
@@ -347,9 +364,10 @@ class @ReactiveTableInstance
     recordsData
 
 
-  formData: (type, id = null) ->
-    if type is 'update' and id?
-      record = @collection.findOne(id)
+  formData: (type, currentRecord = null) ->
+    typeCap = type.capitalize()
+    if type is 'update' and currentRecord?
+      record = currentRecord
     else
       record = null
 
@@ -362,8 +380,8 @@ class @ReactiveTableInstance
       for key, col of @_cols()
         dataKey = col.dataKey or col.sortKey or key
         localCol = _.clone(col)
-        if col[type]?(record) or (col[type] is true) or col["staticOn_#{type}"] or col["hiddenOn_#{type}"]
-          if col["hiddenOn_#{type}"]
+        if col[type]?(record) or (col[type] is true) or col["staticOn#{typeCap}"] or col["hiddenOn#{typeCap}"]
+          if col["hiddenOn#{typeCap}"]
             col.type = 'hidden'
           if not col.type?
             col.type = 'text'
@@ -386,13 +404,13 @@ class @ReactiveTableInstance
 
           localCol.realValue = value
 
-          if col["staticOn_#{type}"]
+          if col["staticOn#{typeCap}"]
             localCol.static = true
             localCol.value = value
             if col?.valueFunc?
               localCol.realValue = record[key]
 
-          if col["hiddenOn_#{type}"]
+          if col["hiddenOn#{typeCap}"]
             localCol.hidden = true
             localCol.value = value
             if col?.valueFunc?
@@ -479,10 +497,11 @@ class @ReactiveTableInstance
 
   checkFields: (rec, type="insert") ->
     @errorMessage = ''
+    typeCap = type.capitalize()
     for key, col of @_cols()
       try
-        console.log("checkFields", type, key, col, col[type]) if DEBUG
-        if key isnt '_id' and (not col[type] or col["staticOn_#{type}"])
+        console.log("checkFields", type, typeCap, key, col) if DEBUG
+        if key isnt '_id' and (not col[type] or col["staticOn#{typeCap}"]) and not col["on#{typeCap}"]?
           delete rec[key]
         else
           dataKey = col.dataKey or col.sortKey or key
@@ -491,8 +510,8 @@ class @ReactiveTableInstance
             col.header = (col.header || key).capitalize()
             @errorMessage = ':' + "#{col.header} is required"
             return false
-          else if type is 'insert' and col.onInsert?
-            rec[dataKey] = col.onInsert()
+          else if col["on#{typeCap}"]?
+            rec[dataKey] = col["on#{typeCap}"](rec)
           else if type in ['update', 'inlineUpdate'] and col.onUpdate?
             rec[dataKey] = col.onUpdate()
       catch error
@@ -509,9 +528,10 @@ class @ReactiveTableInstance
         Router.go(@newRecordPath)  # Should already be handled
       else
         console.log("formData", @formTemplate, @formData('insert')) if DEBUG
+        title =  @newRecordText or 'New ' + @recordsName().capitalize()
         MaterializeModal.form
           bodyTemplate: @formTemplate
-          title: 'New ' + @recordsName().capitalize()
+          title: title
           columns: @formData('insert').columns
           callback: @insertRecord
           fullscreen: Meteor.isCordova
@@ -527,7 +547,7 @@ class @ReactiveTableInstance
           Meteor.call @methodOnInsert, rec, (error, rtn) =>
             if error
               console.log("Error saving " + @recordName(), error)
-              Materialize.toast("Error saving " + @recordName() + " : #{error.reason}", 3000, 'red')
+              Materialize.toast("Error saving " + @recordName() + " : #{error.reason}", 3000, 'toast-error')
             else
               Materialize.toast(@recordName() + " created", 3000, 'green')
               @insertRecordCallback?(rtn or rec)
@@ -535,12 +555,12 @@ class @ReactiveTableInstance
           @collection.insert rec, (error, effectedCount) =>
             if error
               console.log("Error saving " + @recordName(), error)
-              Materialize.toast("Error saving " + @recordName() + " : #{error.reason}", 3000, 'red')
+              Materialize.toast("Error saving " + @recordName() + " : #{error.reason}", 3000, 'toast-error')
             else
               Materialize.toast(@recordName() + " created", 3000, 'green')
               @insertRecordCallback?(rec)
       else
-        Materialize.toast("Error could not save " + @recordName() + " " + @errorMessage, 3000, 'red')
+        Materialize.toast("Error could not save " + @recordName() + " " + @errorMessage, 3000, 'toast-error')
 
 
   updateRecordTitle: ->
@@ -548,14 +568,18 @@ class @ReactiveTableInstance
 
 
   onUpdateRecord: (rec) ->
-    @currentRecordId = rec._id
+    #@currentRecordId = rec._id
+    throw new Metoer.eror("badData", "No record Id") if not rec?._id
+    @currentRecord = @collection.findOne
+      _id: rec._id
+    throw new Metoer.eror("badData", "No record found to update") if not rec?._id
     if @options.onUpdateRecord? and typeof options.onUpdateRecord is 'function'
-      @options.onUpdateRecord(rec)
+      @options.onUpdateRecord(rec, @currentRecord)
     else
       MaterializeModal.form
         bodyTemplate: @formTemplate
         title: @updateRecordTitle()
-        columns: @formData('update', @currentRecordId).columns
+        columns: @formData('update', @currentRecord).columns
         callback: @updateRecord
         fullscreen: Meteor.isCordova
         #fixedFooter: true
@@ -565,10 +589,13 @@ class @ReactiveTableInstance
     @errorMessage = ''
     if yesNo
       rec = {} unless rec
-      rec._id = @currentRecordId unless rec._id?
-      if @updateOk(rec)
-        @updateThisRecord(@currentRecordId, rec)
-    @currentRecordId = null
+      rec._id = @currentRecord._id #unless rec._id?
+      _.extend(@currentRecord, rec)
+      if @updateOk(@currentRecord)
+        @updateThisRecord(@currentRecord._id, rec)
+      else
+        console.log("updateRecord: updateOk failed!", rec)
+    @currentRecord = null
 
 
   updateThisRecord: (recId, rec, type="update") =>
@@ -578,7 +605,7 @@ class @ReactiveTableInstance
         Meteor.call @methodOnUpdate, recId, rec, (error, rtn) =>
           if error
             console.log("Error updating " + @recordName(), error)
-            Materialize.toast("Error updating " + @recordName() + " : #{error.reason}", 3000, 'red')
+            Materialize.toast("Error updating " + @recordName() + " : #{error.reason}", 3000, 'toast-error')
           else if type isnt "inlineUpdate"
             Materialize.toast(@recordName() + " saved", 3000, 'green')
             @updateRecordCallback?(rtn or rec)
@@ -589,13 +616,13 @@ class @ReactiveTableInstance
         , (error, effectedCount) =>
           if error
             console.log("Error updating " + @recordName(), error)
-            Materialize.toast("Error updating " + @recordName() + " : #{error.reason}", 3000, 'red')
+            Materialize.toast("Error updating " + @recordName() + " : #{error.reason}", 3000, 'toast-error')
           else
             if type isnt "inlineUpdate"
               Materialize.toast(@recordName() + " updated", 3000, 'green')
               @updateRecordCallback?(rec)
     else
-      Materialize.toast("Error could not update " + @recordName() + " " + @errorMessage, 3000, 'red')
+      Materialize.toast("Error could not update " + @recordName() + " " + @errorMessage, 3000, 'toast-error')
 
 
   onRemoveRecord: (rec) ->
@@ -613,7 +640,7 @@ class @ReactiveTableInstance
           if yesNo
             Meteor.call @methodOnRemove, rec._id, (error, result) ->
               if error
-                Materialize.toast("Error on delete: #{error.reason}", 4000, 'red')
+                Materialize.toast("Error on delete: #{error.reason}", 4000, 'toast-error')
                 @removeRecordCallback?()
 
 

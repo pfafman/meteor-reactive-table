@@ -11,7 +11,6 @@ Template.reactiveTableFilter.onRendered ->
   @$('select').material_select()
 
 
-
 Template.reactiveTableFilter.onDestroyed ->
   # ...
 

@@ -17,8 +17,10 @@ Template.reactiveTableFormItem.onRendered ->
 
 
 Template.reactiveTableFormItem.helpers
+
   textArea: ->
     @displayType is 'textarea'
+
 
   forKey: ->
     if @displayType isnt 'select'
@@ -26,13 +28,17 @@ Template.reactiveTableFormItem.helpers
 
 
   inputTemplate: ->
-    rtn = 'reactiveTableFormInput'
-    switch @displayType
-      when 'textarea', 'select', 'checkbox', 'date'
-        type = capitalize(@displayType)
-        rtn = "reactiveTableForm#{type}"
-      else
-        rtn = 'reactiveTableFormInput'
+    rtn = ""
+    if @inputFormTemplate
+      rtn = @inputFormTemplate
+    else
+      switch @displayType
+        when 'textarea', 'select', 'checkbox', 'date'
+          type = capitalize(@displayType)
+          rtn = "reactiveTableForm#{type}"
+        else
+          rtn = "reactiveTableFormInput"
+    console.log("inputTemplate", rtn) if DEBUG
     rtn
 
   showHelpText: ->
