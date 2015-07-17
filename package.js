@@ -32,7 +32,7 @@ Package.on_use(function (api, where) {
 
 
   api.imply([
-    'tmeasday:publish-counts@0.3.6',
+    'tmeasday:publish-counts@0.4.0',
   ], ["client", "server"]);
 
 
