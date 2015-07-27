@@ -9,7 +9,6 @@ capitalize = (string) ->
 Template.reactiveTableFormItem.onRendered ->
   #console.log("reactiveTableFormItem rendered")
   @$('[rel="tooltip"]').tooltip()
-  @$('select').material_select()
   @$('.datepicker')?.pickadate
     selectMonths: false
     selectYears: false

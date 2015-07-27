@@ -419,6 +419,7 @@ class @ReactiveTableInstance
           localCol.header = (col.header or key).capitalize()
           localCol.key = key
           localCol.dataKey = dataKey
+          localCol.record = record
 
           recordData.push localCol
       columns: recordData

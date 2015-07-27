@@ -1,8 +1,9 @@
 
 <template name="reactiveTableSelect">
-  <div class="select">
+  <div class="input-field select">
   {{#if doEdit}}
     {{> reactiveTableSelectSelect}}
+    <label>{{header}}</label>
   {{else}}
     <div class="select-view">
       {{getValue}}
