@@ -514,7 +514,7 @@ class @ReactiveTableInstance
           else if col["on#{typeCap}"]?
             rec[dataKey] = col["on#{typeCap}"](rec)
           else if type in ['update', 'inlineUpdate'] and col.onUpdate?
-            rec[dataKey] = col.onUpdate()
+            rec[dataKey] = col.onUpdate(rec)
       catch error
         @errorMessage = ':' + error.reason or error
         return false

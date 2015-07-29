@@ -2,7 +2,7 @@
 Package.describe({
   name: 'pfafman:reactive-table',
   summary: "Paging Table for Meteor",
-  version: "0.1.4_2",
+  version: "0.1.4_3",
   git: "https://github.com/pfafman/meteor-reactive-table.git",
 });
 
