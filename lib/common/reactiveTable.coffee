@@ -288,27 +288,27 @@ class @ReactiveTableInstance
   headers: ->
     rtn = []
     for key, col of @_cols()
-      #if not (col.hide?() or col.hide)
-      dataKey = col.dataKey or col.sortKey or key
-      if col.canFilterOn? and not col.hide?()
-        canFilterOn = col.canFilterOn
-      else
-        canFilterOn = false
-      tmpl = Template.instance()
-      colName = col.header or key
-      if T9n?
-        colName = T9n.get(colName, false)
-      rtn.push
-        key: key
-        dataKey: dataKey
-        colName: colName
-        column: col
-        noSort: col.noSort
-        sort: dataKey is @get('sortColumn')
-        desc: @get('sortDirection') is -1
-        filterOnThisCol: dataKey is @get('filterColumn')
-        canFilterOn: canFilterOn
-        hide: col.hide?() or col.hide
+      if not col.hide?() #or col.hide)
+        dataKey = col.dataKey or col.sortKey or key
+        if col.canFilterOn? and not col.hide?()
+          canFilterOn = col.canFilterOn
+        else
+          canFilterOn = false
+        tmpl = Template.instance()
+        colName = col.header or key
+        if T9n?
+          colName = T9n.get(colName, false)
+        rtn.push
+          key: key
+          dataKey: dataKey
+          colName: colName
+          column: col
+          noSort: col.noSort
+          sort: dataKey is @get('sortColumn')
+          desc: @get('sortDirection') is -1
+          filterOnThisCol: dataKey is @get('filterColumn')
+          canFilterOn: canFilterOn
+          hide: col.hide?() or col.hide
     console.log("headers", rtn) if DEBUG
     rtn
 
@@ -332,7 +332,7 @@ class @ReactiveTableInstance
       colData = []
       for key, col of cols
         dataKey = col.dataKey or col.sortKey or key
-        if not (col.hide?() or col.hide)
+        if not col.hide?() #or col.hide)
           value = @valueFromRecord(key, col, record)
           if col.display?
             value = col.display(value, record)
