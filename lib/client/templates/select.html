@@ -1,19 +1,19 @@
 
 <template name="reactiveTableSelect">
-  <div class="input-field select">
   {{#if doEdit}}
-    {{> reactiveTableSelectSelect}}
-    <label>{{header}}</label>
+    <div class="input-field select">
+      {{> reactiveTableSelectSelect}}
+      <label>{{header}}</label>
+    </div>
   {{else}}
-    <div class="select-view">
+    <div class="reactive-table-value">
       {{getValue}}
     </div>
   {{/if}}
-  </div>
 </template>
 
 <template name="reactiveTableSelectSelect">
-  <select>
+  <select id="{{key}}">
     {{> reactiveTableOptions}}
   </select>
 </template>

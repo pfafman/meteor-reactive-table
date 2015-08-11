@@ -184,11 +184,19 @@
     {{#if ../options.extraControls}}{{> Template.dynamic template=../options.extraControls}}{{/if}}
 
     {{#if updateOk}}
-        <a href="{{#if ../options.editRoute}}{{pathFor ../options.editRoute}}{{/if}}" 
+      {{#if ../options.updateRoute}}
+        <a href="{{pathFor ../options.updateRoute}}" 
+          class="{{../options.editClass}} tooltipped"
+          data-tooltip='Edit Record' rel='tooltip'>
+          <i class="material-icons">mode_edit</i>
+        </a>
+      {{else}}
+        <a href="" 
           class="{{../options.editClass}} reactive-table-edit-record tooltipped"
           data-tooltip='Edit Record' rel='tooltip'>
           <i class="material-icons">mode_edit</i>
         </a>
+      {{/if}}
     {{/if}}
 
     {{#if removeOk}}

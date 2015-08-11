@@ -42,3 +42,7 @@ Template.reactiveTableFormItem.helpers
 
   showHelpText: ->
     @helpText? and not @static?
+
+
+Template.reactiveTableFormSelect.onRendered ->
+  @$('select').material_select()
