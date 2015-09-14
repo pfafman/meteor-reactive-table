@@ -591,11 +591,11 @@ class @ReactiveTableInstance
     if yesNo
       rec = {} unless rec
       rec._id = @currentRecord._id #unless rec._id?
-      _.extend(@currentRecord, rec)
-      if @updateOk(@currentRecord)
+      if @updateOk(@currentRecord)   # Do Check on current record not what record will become !!!
+        _.extend(@currentRecord, rec)
         @updateThisRecord(@currentRecord._id, rec)
       else
-        console.log("updateRecord: updateOk failed!", rec)
+        Materialize.toast("Error updating " + @recordName() + " : Insufficient permissions", 3000, 'toast-error')
     @currentRecord = null
 
 
