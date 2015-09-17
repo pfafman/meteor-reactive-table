@@ -194,6 +194,10 @@ Template.reactiveTableRow.helpers
     if @colData?[0]?.record?
       '<pre>' + JSON.stringify(@colData[0].record, null, 2) + '</pre>'
 
+  rowLinkSkip: ->
+    if @aLink
+      "rowlink-skip"
+
 Template.reactiveTableRow.events
 
   'click td': (event, tmpl) ->
