@@ -18,6 +18,8 @@ class @ReactiveTable
   # methodOnUpdate   : 'updateTestDataRecord'
   # methodOnRemove   : 'removeTestDataRecord'
   
+  downLoadPermissionsAndSelect: ->
+    throw new Meteor.Error("accessError", "No Access")
 
   constructor: (@options = {}) ->
     if Meteor.isClient
@@ -89,7 +91,11 @@ class @ReactiveTable
     meths = {}
     
     #if true #@doDownloadLink
-    meths["reactiveTable_" + name + "_getCSV"] = (select = {}, fields = {}) ->
+    meths["reactiveTable_" + name + "_getCSV"] = (select = {}, fields = {}) =>
+      console.log("reactiveTable getCSV", fields) if DEBUG
+      check(select, Object)
+      check(fields, Object)
+      select = @downLoadPermissionsAndSelect?(select) or select
       csv = []
       fieldKeys = _.keys(fields)
       csv.push fieldKeys.join(',')
@@ -103,7 +109,11 @@ class @ReactiveTable
             value = rec
             for subElement in subElements
               value = value?[subElement]
-            row.push value
+            if typeof value is 'object'
+              value = JSON.stringify(value)
+            if typeof value is 'string'
+              value = value.replace(/\"/g, "'")
+            row.push '"' + value + '"'
           csv.push row.join(',')
       csv.join("\n")
             
@@ -170,6 +180,8 @@ class @ReactiveTableInstance
       'removeAllOk'
       'tableClass'
       'newRecordText'
+      'downloadFields'
+      'downLoadPermissionsAndSelect'
     ]
 
     for key in optionKeys
@@ -645,7 +657,8 @@ class @ReactiveTableInstance
                 @removeRecordCallback?()
 
 
-  downloadRecords: (callback) ->
+  downloadRecords: (callback) =>
+    console.log("downloadRecords", @downloadFields) if DEBUG
     fields = {}
     if @downloadFields?
       fields = @downloadFields
