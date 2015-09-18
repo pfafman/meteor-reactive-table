@@ -14,6 +14,8 @@ class @ReactiveTable
   downloadFields   : null
   rowLink          : null
   tableCreateError : 'Error creating Table'
+  fixedFooter      : false
+  
   # methodOnInsert   : 'insertTestDataRecord'
   # methodOnUpdate   : 'updateTestDataRecord'
   # methodOnRemove   : 'removeTestDataRecord'
@@ -92,15 +94,16 @@ class @ReactiveTable
     
     #if true #@doDownloadLink
     meths["reactiveTable_" + name + "_getCSV"] = (select = {}, fields = {}) =>
-      console.log("reactiveTable getCSV", fields) if DEBUG
       check(select, Object)
       check(fields, Object)
       select = @downLoadPermissionsAndSelect?(select) or select
+      console.log("reactiveTable getCSV", name, JSON.stringify(select)) if DEBUG
       csv = []
       fieldKeys = _.keys(fields)
       csv.push fieldKeys.join(',')
       cursor = collection.find? select,
         fields: fields
+      console.log("reactiveTable getCSV count", cursor?.count())
       if cursor?.forEach?
         cursor.forEach (rec) ->
           row = []
@@ -115,6 +118,8 @@ class @ReactiveTable
               value = value.replace(/\"/g, "'")
             row.push '"' + value + '"'
           csv.push row.join(',')
+      else
+        console.log("eactiveTable getCSV no data", select, collection.find)
       csv.join("\n")
             
     Meteor.methods meths
@@ -182,6 +187,7 @@ class @ReactiveTableInstance
       'newRecordText'
       'downloadFields'
       'downLoadPermissionsAndSelect'
+      'fixedFooter'
     ]
 
     for key in optionKeys
@@ -548,6 +554,7 @@ class @ReactiveTableInstance
           columns: @formData('insert').columns
           callback: @insertRecord
           fullscreen: Meteor.isCordova
+          fixedFooter: @fixedFooter
           #fixedFooter: true
   
 
@@ -595,6 +602,7 @@ class @ReactiveTableInstance
         columns: @formData('update', @currentRecord).columns
         callback: @updateRecord
         fullscreen: Meteor.isCordova
+        fixedFooter: @fixedFooter
         #fixedFooter: true
 
 
@@ -657,14 +665,20 @@ class @ReactiveTableInstance
                 @removeRecordCallback?()
 
 
-  downloadRecords: (callback) =>
-    console.log("downloadRecords", @downloadFields) if DEBUG
+  downloadRecords: (callback, select, downloadFields) =>
+    
+    select = @select() unless select
+
     fields = {}
-    if @downloadFields?
+    if downloadFields
+      fields = downloadFields
+    else if @downloadFields?
       fields = @downloadFields
     else
       for key, col of @_cols()
         dataKey = col.dataKey or col.sortKey or key
         fields[dataKey] = 1
 
-    Meteor.call "reactiveTable_" + @name + "_getCSV", @select(), fields, callback
+    console.log("downloadRecords", @name, select, fields) if DEBUG
+    
+    Meteor.call "reactiveTable_" + @name + "_getCSV", select, fields, callback
