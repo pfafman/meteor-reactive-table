@@ -120,7 +120,7 @@
 
 
 <template name="reactiveTableHeader">
-  <th class="{{column.class}}">
+  <th class="{{column.class}}" style="{{column.style}}">
     {{#if noSort}}
       <button class="btn-flat waves-effect table-col-head" disabled="disabled">
         {{capitalize colName}}
@@ -149,7 +149,7 @@
 
 <template name="reactiveTableRow">
   {{#each colData}}
-    <td class="{{column.class}} {{rowLinkSkip}}">
+    <td class="{{column.class}} {{rowLinkSkip}}" style="{{column.style}}">
       {{#if aLink}}
           <a href="{{aLink}}" class="{{#if title}}tooltipped{{/if}}" data-tooltip="{{#if title}}{{title}}{{/if}}" rel='{{#if title}}tooltip{{/if}}' target="{{column.target}}">
               {{#if template}}
