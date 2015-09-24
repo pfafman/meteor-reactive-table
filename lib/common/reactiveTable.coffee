@@ -540,7 +540,7 @@ class @ReactiveTableInstance
 
 
   onInsertRecord: ->
-    if @options.onInsertRecord?  and typeof options.onInsertRecord is 'function'
+    if @options.onInsertRecord?  and typeof @options.onInsertRecord is 'function'
       @options.onInsertRecord()
     else
       if @newRecordRoute?
@@ -589,11 +589,12 @@ class @ReactiveTableInstance
 
   onUpdateRecord: (rec) ->
     #@currentRecordId = rec._id
+    console.log("onUpdateRecord", rec, @) if DEBUG
     throw new Metoer.eror("badData", "No record Id") if not rec?._id
     @currentRecord = @collection.findOne
       _id: rec._id
     throw new Metoer.eror("badData", "No record found to update") if not rec?._id
-    if @options.onUpdateRecord? and typeof options.onUpdateRecord is 'function'
+    if @options?.onUpdateRecord? and typeof @options.onUpdateRecord is 'function'
       @options.onUpdateRecord(rec, @currentRecord)
     else
       MaterializeModal.form
@@ -647,7 +648,7 @@ class @ReactiveTableInstance
 
 
   onRemoveRecord: (rec) ->
-    if @options.onRemoveRecord?  and typeof options.onRemoveRecord is 'function'
+    if @options.onRemoveRecord?  and typeof @options.onRemoveRecord is 'function'
       @options.onRemoveRecord(rec)
     else
       if rec.recordName?
