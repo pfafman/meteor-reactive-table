@@ -195,6 +195,10 @@ Template.reactiveTableRow.onRendered ->
   @$('[rel="tooltip"]').tooltip()
   
 
+Template.reactiveTableRow.onDestroyed ->
+  @$('[rel="tooltip"]').tooltip('remove')
+  
+
 Template.reactiveTableRow.helpers
   json: ->
     if @colData?[0]?.record?
@@ -214,16 +218,15 @@ Template.reactiveTableRow.events
   'click .reactive-table-delete-record': (event, tmpl) ->
     console.log("delete", @,  Template.parentData(1)) if DEBUG
     tmpl.$('[rel="tooltip"]').tooltip('remove')
-    #Template.parentData(1).options?.onDelete?(@) or Template.parentData(1).onDelete?(@)
     Template.parentData(1).onRemoveRecord?(@)
-    tmpl.$('[rel="tooltip"]').tooltip()
+    tmpl.$('[rel="tooltip"]').tooltip('')
 
 
   'click .reactive-table-edit-record': (event, tmpl) ->
-    console.log("edit: TODO: Enable Modal Edit?", @,  Template.parentData(1)) if DEBUG
-    #Template.parentData(1).options?.onEdit?(@) or Template.parentData(1).onEdit?(@)
+    console.log("edit: TODO: Enable Modal Edit?", @,  Template.parentData(1)) #if DEBUG
     tmpl.$('[rel="tooltip"]').tooltip('remove')
     Template.parentData(1).onUpdateRecord?(@)
-    tmpl.$('[rel="tooltip"]').tooltip()
+    tmpl.$('[rel="tooltip"]').tooltip('')
+
 
 
