@@ -20,6 +20,15 @@ Template.reactiveTableFormItem.helpers
     @displayType is 'textarea'
 
 
+  patternValue: ->
+    if @pattern
+      @pattern
+    else if @displayType is 'number'
+      "[0-9]*"
+    
+
+
+
   forKey: ->
     if @displayType isnt 'select'
       @key
