@@ -558,9 +558,12 @@ class @ReactiveTableInstance
           #fixedFooter: true
   
 
-  insertRecord: (yesNo, rec) =>
-    @errorMessage = ''
-    if yesNo
+  insertRecord: (error, rtn) =>
+    if error
+      Materialize.toast("Error could not save " + @recordName() + " " + @errorMessage, 3000, 'toast-error')
+    else if rtn?.submit
+      @errorMessage = ''
+      rec = rtn.value
       console.log("insertRecord", @methodOnInsert, rec) if DEBUG
       if @insertOk(rec) and @checkFields(rec, 'insert')
         if @methodOnInsert
@@ -607,10 +610,12 @@ class @ReactiveTableInstance
         #fixedFooter: true
 
 
-  updateRecord: (yesNo, rec) =>
-    @errorMessage = ''
-    if yesNo
-      rec = {} unless rec
+  updateRecord: (error, rtn) =>
+    if error
+      Materialize.toast("Error updating " + @recordName() + " " + error.reason, 3000, 'toast-error')
+    else if rtn.submit
+      @errorMessage = ''
+      rec = {} unless rtn.value
       rec._id = @currentRecord._id #unless rec._id?
       if @updateOk(@currentRecord)   # Do Check on current record not what record will become !!!
         _.extend(@currentRecord, rec)
@@ -658,8 +663,10 @@ class @ReactiveTableInstance
       MaterializeModal.confirm
         title: "Delete #{@recordName()}"
         message: "Are you sure you want to delete #{@recordName()}#{recName}"
-        callback: (yesNo) =>
-          if yesNo
+        callback: (error, rtn) =>
+          if error
+            Materialize.toast("Error on delete: #{error.reason}", 4000, 'toast-error')
+          else if rtn?.submit
             Meteor.call @methodOnRemove, rec._id, (error, result) ->
               if error
                 Materialize.toast("Error on delete: #{error.reason}", 4000, 'toast-error')
