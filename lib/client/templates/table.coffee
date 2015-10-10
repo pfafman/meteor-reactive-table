@@ -172,6 +172,8 @@ Template.reactiveTableHeader.helpers
 Template.reactiveTableHeader.events
   'click .table-col-head': (e, tmpl) ->
     e.preventDefault()
+    tmpl.$('[rel="tooltip"]').tooltip('remove')
+    tmpl.$('[rel="tooltip"]').tooltip()
     Template.parentData(1).setSort(@dataKey)
 
 
@@ -218,6 +220,7 @@ Template.reactiveTableRow.events
   'click .reactive-table-delete-record': (event, tmpl) ->
     console.log("delete", @,  Template.parentData(1)) if DEBUG
     tmpl.$('[rel="tooltip"]').tooltip('remove')
+    tmpl.$('[rel="tooltip"]').tooltip('')
     Template.parentData(1).onRemoveRecord?(@)
     tmpl.$('[rel="tooltip"]').tooltip('')
 
@@ -225,6 +228,7 @@ Template.reactiveTableRow.events
   'click .reactive-table-edit-record': (event, tmpl) ->
     console.log("edit: TODO: Enable Modal Edit?", @,  Template.parentData(1)) #if DEBUG
     tmpl.$('[rel="tooltip"]').tooltip('remove')
+    tmpl.$('[rel="tooltip"]').tooltip('')
     Template.parentData(1).onUpdateRecord?(@)
     tmpl.$('[rel="tooltip"]').tooltip('')
 

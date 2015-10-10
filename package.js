@@ -2,7 +2,7 @@
 Package.describe({
   name: 'pfafman:reactive-table',
   summary: "Paging Table for Meteor",
-  version: "0.2.2",
+  version: "0.2.3",
   git: "https://github.com/pfafman/meteor-reactive-table.git",
 });
 
@@ -27,7 +27,7 @@ Package.on_use(function (api, where) {
     'mongo',
     'tmeasday:publish-counts',
     'softwarerero:accounts-t9n',
-    'pfafman:materialize-modal',
+    'meteorstuff:materialize-modal',
     ], ['client', 'server']);
 
 
