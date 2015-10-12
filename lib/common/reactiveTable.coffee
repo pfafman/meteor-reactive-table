@@ -615,7 +615,7 @@ class @ReactiveTableInstance
       Materialize.toast("Error updating " + @recordName() + " " + error.reason, 3000, 'toast-error')
     else if rtn.submit
       @errorMessage = ''
-      rec = {} unless rtn.value
+      rec = rtn.value or {}
       rec._id = @currentRecord._id #unless rec._id?
       if @updateOk(@currentRecord)   # Do Check on current record not what record will become !!!
         _.extend(@currentRecord, rec)
