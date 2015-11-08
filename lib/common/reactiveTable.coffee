@@ -212,6 +212,11 @@ class @ReactiveTableInstance
     else
       @reset()
 
+    if Router.current().params?.query?.filterColumn and Router.current().params.query.filterValue
+      console.log("Query has filter on it", Router.current().params.query)
+      @set("filterColumn", Router.current().params.query.filterColumn)
+      @set("filterValue", Router.current().params.query.filterValue)
+
 
   reset: ->
     @set("limit", @options.limit)
