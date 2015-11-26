@@ -25,6 +25,10 @@ Template.reactiveTable.onRendered ->
   @$('[rel="tooltip"]').tooltip()
 
 
+Template.reactiveTable.onDestroyed ->
+  @$('[rel="tooltip"]').tooltip('remove')
+
+
 Template.reactiveTable.helpers
 
   firstReady: ->
@@ -155,6 +159,10 @@ Template.reactiveTableHeading.events
 
 Template.reactiveTableHeader.onRendered ->
   @$('[rel="tooltip"]').tooltip()
+
+
+Template.reactiveTableHeader.onDestroyed ->
+  @$('[rel="tooltip"]').tooltip('remove')
 
 
 Template.reactiveTableHeader.helpers

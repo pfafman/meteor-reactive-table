@@ -14,6 +14,10 @@ Template.reactiveTableFormItem.onRendered ->
   #$('.timepicker')?.pickatime()
 
 
+Template.reactiveTableFormItem.onDestroyed ->
+  @$('[rel="tooltip"]').tooltip('remove')
+
+
 Template.reactiveTableFormItem.helpers
 
   textArea: ->
