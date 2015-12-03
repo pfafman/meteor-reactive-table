@@ -93,34 +93,40 @@ class @ReactiveTable
     meths = {}
     
     #if true #@doDownloadLink
-    meths["reactiveTable_" + name + "_getCSV"] = (select = {}, fields = {}) =>
+    meths["reactiveTable_" + name + "_getCSV"] = (select = {}, fields = {}, limit) =>
       check(select, Object)
       check(fields, Object)
       select = @downLoadPermissionsAndSelect?(select) or select
-      console.log("reactiveTable getCSV", name, JSON.stringify(select)) if DEBUG
-      csv = []
-      fieldKeys = _.keys(fields)
-      csv.push fieldKeys.join(',')
-      cursor = collection.find? select,
-        fields: fields
-      console.log("reactiveTable getCSV count", cursor?.count())
-      if cursor?.forEach?
-        cursor.forEach (rec) ->
-          row = []
-          for fieldKey in fieldKeys
-            subElements = fieldKey.split('.')
-            value = rec
-            for subElement in subElements
-              value = value?[subElement]
-            if typeof value is 'object'
-              value = JSON.stringify(value)
-            if typeof value is 'string'
-              value = value.replace(/\"/g, "'")
-            row.push '"' + value + '"'
-          csv.push row.join(',')
-      else
-        console.log("eactiveTable getCSV no data", select, collection.find)
-      csv.join("\n")
+      console.log("reactiveTable getCSV", name, JSON.stringify(select), limit) if DEBUG
+      
+      if Meteor.isServer
+        csv = '' #[]
+        fieldKeys = _.keys(fields)
+        csv += fieldKeys.join(',') + "\n"
+        options =
+          fields: fields
+        if limit
+          options.limit = limit
+        cursor = collection.find?(select, options)
+        console.log("reactiveTable getCSV count", cursor?.count())
+        if cursor?.forEach?
+          cursor.forEach (rec) ->
+            row = []
+            for fieldKey in fieldKeys
+              subElements = fieldKey.split('.')
+              value = rec
+              for subElement in subElements
+                value = value?[subElement]
+              if typeof value is 'object'
+                value = JSON.stringify(value)
+              if typeof value is 'string'
+                value = value.replace(/\"/g, "'")
+              row.push '"' + value + '"'
+            csv +=  row.join(',') + "\n" #.push row.join(',')
+        else
+          console.log("eactiveTable getCSV no data", select, collection.find)
+        console.log("reactiveTable getCSV return string length #{csv.length}") if DEBUG
+        csv #.join("\n")
             
     Meteor.methods meths
 
@@ -678,8 +684,7 @@ class @ReactiveTableInstance
                 @removeRecordCallback?()
 
 
-  downloadRecords: (callback, select, downloadFields) =>
-    
+  downloadRecords: (callback, select, downloadFields, limit) =>
     select = @select() unless select
 
     fields = {}
@@ -692,6 +697,8 @@ class @ReactiveTableInstance
         dataKey = col.dataKey or col.sortKey or key
         fields[dataKey] = 1
 
-    console.log("downloadRecords", @name, select, fields) if DEBUG
+    console.log("downloadRecords", @name, select, fields, limit) #if DEBUG
     
-    Meteor.call "reactiveTable_" + @name + "_getCSV", select, fields, callback
+    Meteor.call "reactiveTable_" + @name + "_getCSV", select, fields, limit, callback
+
+
