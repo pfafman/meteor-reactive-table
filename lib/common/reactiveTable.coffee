@@ -270,6 +270,8 @@ class @ReactiveTableInstance
         else
           select[dataKey] =
             $ne: true
+      else if col.type is 'number' and filterValue isnt ''
+        select[dataKey] = Number(filterValue)
       else if filterValue and col and filterValue isnt ''
         select[dataKey] =
           $regex: ".*#{filterValue}.*"
