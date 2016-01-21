@@ -218,6 +218,7 @@ Template.reactiveTableRow.helpers
     if @aLink
       "rowlink-skip"
 
+
 Template.reactiveTableRow.events
 
   'click td': (event, tmpl) ->
