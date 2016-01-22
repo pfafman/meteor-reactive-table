@@ -11,6 +11,8 @@ Template.reactiveTableFormItem.onRendered ->
   @$('.datepicker')?.pickadate
     selectMonths: false
     selectYears: false
+    hiddenName: true
+    formatSubmit: 'yyyy-mm-dd'
   #$('.timepicker')?.pickatime()
 
 
