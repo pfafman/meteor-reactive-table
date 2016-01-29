@@ -136,9 +136,10 @@ Template.reactiveTableHeading.events
 
 
   'click #download-records': (event, tmpl) ->
-    console.log("Download Records") #if DEBUG
+    console.log("Download Records", tmpl, @) #if DEBUG
 
-    filename = @tableTitle + '.csv'
+    tableTitle = @tableTitle or @name or 'records'
+    filename = tableTitle + '.csv'
     @downloadRecords (error, csv) ->
       if error
         Materialize.toast("Error getting CSV to download", 3000, 'toast-error')
