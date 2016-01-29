@@ -23,6 +23,7 @@ class @ReactiveTable
   downLoadPermissionsAndSelect: ->
     throw new Meteor.Error("accessError", "No Access")
 
+
   constructor: (@options = {}) ->
     if Meteor.isClient
       @dict = new ReactiveDict(@_dictName())
@@ -117,10 +118,13 @@ class @ReactiveTable
               value = rec
               for subElement in subElements
                 value = value?[subElement]
+              
               if typeof value is 'object'
                 value = JSON.stringify(value)
               if typeof value is 'string'
                 value = value.replace(/\"/g, "'")
+              if not value?
+                value = ''
               row.push '"' + value + '"'
             csv +=  row.join(',') + "\n" #.push row.join(',')
         else
