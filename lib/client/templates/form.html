@@ -39,6 +39,8 @@
       name="{{key}}"
       id="{{key}}"
       value="{{value}}"
+      min="{{min}}"
+      max="{{max}}"
       required="{{required}}"
       autofocus="{{autofocus}}"
       autocomplete="{{autocomplete}}"
@@ -49,6 +51,45 @@
       data-position="{{#if tooltip}}right{{/if}}"
       pattern="{{patternValue}}"
       disabled="{{static}}" />
+    {{#if hasIcon}}
+        <span class="{{iconClass}}"></span>
+    {{/if}}
+    {{#if hasError}}
+      <span class='red-text'>{{errorText}}</span>
+    {{/if}}
+   
+  </div>
+</template>
+
+
+<template name="reactiveTableFormRange">
+  <div class="{{#if static}}static-{{/if}}input-field">
+    
+   
+    <label for="{{#unless static}}{{key}}{{/unless}}" class="{{#if value}}active{{/if}}">{{header}}</label>
+    <p class="range-field">
+      <input 
+        type="range" 
+        class="form-control 
+          {{#if tooltip}}tooltipped{{/if}} validate 
+          {{#if hasError}}invalid{{/if}} 
+          {{#if hasSuccess}}valid{{/if}}" 
+        name="{{key}}"
+        id="{{key}}"
+        value="{{value}}"
+        min="{{min}}"
+        max="{{max}}"
+        required="{{required}}"
+        autofocus="{{autofocus}}"
+        autocomplete="{{autocomplete}}"
+        placeholder="{{placeholderNOT}}"
+        checked="{{checked}}"
+        data-tooltip="{{tooltip}}" 
+        rel='{{#if tooltip}}tooltip{{/if}}' 
+        data-position="{{#if tooltip}}right{{/if}}"
+        pattern="{{patternValue}}"
+        disabled="{{static}}" />
+    </p>
     {{#if hasIcon}}
         <span class="{{iconClass}}"></span>
     {{/if}}

@@ -31,8 +31,6 @@ Template.reactiveTableFormItem.helpers
       @pattern
     else if @displayType is 'number'
       "[0-9]*"
-    
-
 
 
   forKey: ->
@@ -46,13 +44,14 @@ Template.reactiveTableFormItem.helpers
       rtn = @inputFormTemplate
     else
       switch @displayType
-        when 'textarea', 'select', 'checkbox', 'date'
+        when 'textarea', 'select', 'checkbox', 'date', 'range'
           type = capitalize(@displayType)
           rtn = "reactiveTableForm#{type}"
         else
           rtn = "reactiveTableFormInput"
     console.log("inputTemplate", rtn) if DEBUG
     rtn
+
 
   showHelpText: ->
     @helpText? and not @static?
