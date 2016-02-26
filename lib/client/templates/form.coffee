@@ -59,3 +59,8 @@ Template.reactiveTableFormItem.helpers
 
 Template.reactiveTableFormSelect.onRendered ->
   @$('select').material_select()
+
+
+Template.reactiveTableFormDate.helpers
+  dateValue: ->
+    moment(@value).format('D MMMM, YYYY')
