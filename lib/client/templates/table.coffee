@@ -236,7 +236,7 @@ Template.reactiveTableRow.events
 
 
   'click .reactive-table-edit-record': (event, tmpl) ->
-    console.log("edit: TODO: Enable Modal Edit?", @,  Template.parentData(1)) #if DEBUG
+    console.log("edit: TODO: Enable Modal Edit?", @,  Template.parentData(1)) if DEBUG
     tmpl.$('[rel="tooltip"]').tooltip('remove')
     tmpl.$('[rel="tooltip"]').tooltip('')
     Template.parentData(1).onUpdateRecord?(@)

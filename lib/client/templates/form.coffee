@@ -64,3 +64,4 @@ Template.reactiveTableFormSelect.onRendered ->
 Template.reactiveTableFormDate.helpers
   dateValue: ->
     moment(@value).format('D MMMM, YYYY')
+
