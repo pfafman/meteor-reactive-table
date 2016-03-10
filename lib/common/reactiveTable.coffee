@@ -94,16 +94,21 @@ class @ReactiveTable
     meths = {}
     
     #if true #@doDownloadLink
-    meths["reactiveTable_" + name + "_getCSV"] = (select = {}, fields = {}, limit) =>
+    meths["reactiveTable_" + name + "_getCSV"] = (select = {}, fields = {}, limit, downloadHeaders) =>
       check(select, Object)
       check(fields, Object)
       select = @downLoadPermissionsAndSelect?(select) or select
-      console.log("reactiveTable getCSV", name, JSON.stringify(select), limit) if DEBUG
+      console.log("reactiveTable getCSV", name, JSON.stringify(select), limit, @schema, headers) if DEBUG
       
       if Meteor.isServer
         csv = '' #[]
         fieldKeys = _.keys(fields)
-        csv += fieldKeys.join(',') + "\n"
+        headers = []
+        for key in fieldKeys
+          header = downloadHeaders?[key] or @downloadHeaders?[key] or @schema[key]?.header or key
+          header = '"' + header.replace(/\"/g, "'") + '"'
+          headers.push(header)
+        csv += headers.join(',') + "\n"
         options =
           fields: fields
         if limit
@@ -690,7 +695,7 @@ class @ReactiveTableInstance
                 @removeRecordCallback?()
 
 
-  downloadRecords: (callback, select, downloadFields, limit) =>
+  downloadRecords: (callback, select, downloadFields, limit, headers) =>
     select = @select() unless select
 
     fields = {}
@@ -705,6 +710,6 @@ class @ReactiveTableInstance
 
     console.log("downloadRecords", @name, select, fields, limit) #if DEBUG
     
-    Meteor.call "reactiveTable_" + @name + "_getCSV", select, fields, limit, callback
+    Meteor.call "reactiveTable_" + @name + "_getCSV", select, fields, limit, headers, callback
 
 
