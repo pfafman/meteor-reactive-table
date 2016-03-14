@@ -81,7 +81,7 @@ Template.reactiveTableNav.helpers
 
   
   pageUpDisable: ->
-    @skip() + @increment() > @recordCount()
+    @skip() + @increment() >= @recordCount()
 
 
   recordCountStart: ->
