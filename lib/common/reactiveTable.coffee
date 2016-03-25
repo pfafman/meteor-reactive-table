@@ -203,6 +203,7 @@ class @ReactiveTableInstance
       'downloadFields'
       'downLoadPermissionsAndSelect'
       'fixedFooter'
+      'noSub'
     ]
 
     for key in optionKeys
@@ -354,15 +355,19 @@ class @ReactiveTableInstance
 
 
   recordCount: ->
-    Counts.get(@options.countName())
+    if @options.noSub
+      @collection.find().count()
+    else
+      Counts.get(@options.countName())
 
 
   records: ->
-    @collection.find @select(),
+    options =
       limit: @limit()
-      #skip: @skip()
       sort: @sort()
-    .fetch()
+    if @options.noSub
+      options.skip = @skip()
+    @collection.find(@select(), options).fetch()
 
 
   recordsData: ->

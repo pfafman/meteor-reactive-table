@@ -11,14 +11,19 @@ Template.reactiveTable.onCreated ->
   table = @data
 
   @firstReady = new ReactiveVar(false)
-  
-  if table?.publicationName?()?
-    @autorun =>
-      console.log("subscribe", table.publicationName?()) if DEBUG
-      @subscribe table.publicationName(), table.select(), table.sort(), table.limit(), table.skip(), =>
-        @firstReady.set(true)
 
-      
+  if table?.publicationName?()?
+    if table.noSub
+      console.log("NO SUB", @) if DEBUG
+      @firstReady.set(true)
+    else
+      console.log("DO SUB", @) if DEBUG
+      @autorun =>
+        console.log("subscribe", table.publicationName?()) if DEBUG
+        @subscribe table.publicationName(), table.select(), table.sort(), table.limit(), table.skip(), =>
+          @firstReady.set(true)
+
+
 
 Template.reactiveTable.onRendered ->
   console.log('reactiveTable onRendered') if DEBUG
@@ -63,23 +68,23 @@ Template.reactiveTable.helpers
 #
 
 Template.reactiveTableNav.helpers
-  
+
   pageUpSymbol: ->
     @pageUpSymbol or '&#10095;'
 
-  
+
   pageDownSymbol: ->
     @pageDownSymbol or '&#10094;'
 
-  
+
   pageDownDisable: ->
     @skip() is 0
 
-      
+
   showNavCount: ->
     @recordCount() > @increment()
 
-  
+
   pageUpDisable: ->
     @skip() + @increment() >= @recordCount()
 
@@ -94,7 +99,7 @@ Template.reactiveTableNav.helpers
 
   recordCountDisplay: ->
     @recordCount() + " " + @recordsName()
-      
+
 
 
 Template.reactiveTableNav.events
@@ -119,7 +124,7 @@ Template.reactiveTableHeading.onRendered ->
 
 
 Template.reactiveTableHeading.helpers
-  
+
   showNewButton: ->
     @insertOk() and (@options.newRecordRoute or @options.showNewButton)
 
@@ -129,7 +134,7 @@ Template.reactiveTableHeading.helpers
 
 
 Template.reactiveTableHeading.events
-  
+
   'click #new-record': (event, tmpl) ->
     console.log("New Record") if DEBUG
     @onInsertRecord()
@@ -204,11 +209,11 @@ Template.reactiveTableBody.helpers
 Template.reactiveTableRow.onRendered ->
   @$('.modal-trigger').leanModal()
   @$('[rel="tooltip"]').tooltip()
-  
+
 
 Template.reactiveTableRow.onDestroyed ->
   @$('[rel="tooltip"]').tooltip('remove')
-  
+
 
 Template.reactiveTableRow.helpers
   json: ->
@@ -225,7 +230,7 @@ Template.reactiveTableRow.events
   'click td': (event, tmpl) ->
     if Template.parentData(1).options.rowLink? and not $(event.currentTarget).hasClass('rowlink-skip')
       Template.parentData(1).options.rowLink(@.record)
-    
+
 
   'click .reactive-table-delete-record': (event, tmpl) ->
     console.log("delete", @,  Template.parentData(1)) if DEBUG
@@ -241,6 +246,3 @@ Template.reactiveTableRow.events
     tmpl.$('[rel="tooltip"]').tooltip('')
     Template.parentData(1).onUpdateRecord?(@)
     tmpl.$('[rel="tooltip"]').tooltip('')
-
-
-

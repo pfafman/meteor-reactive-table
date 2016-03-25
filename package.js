@@ -2,7 +2,7 @@
 Package.describe({
   name: 'pfafman:reactive-table',
   summary: "Paging Table for Meteor",
-  version: "0.2.13",
+  version: "0.2.14",
   git: "https://github.com/pfafman/meteor-reactive-table.git",
 });
 
@@ -61,7 +61,7 @@ Package.on_use(function (api, where) {
     'lib/common/t9n.coffee',
     ], ['server','client']);
 
-  
+
 });
 
 
