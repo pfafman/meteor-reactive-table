@@ -4,7 +4,7 @@ DEBUG = false
 
 class @ReactiveTable
   classID: 'ReactiveTable'
-  
+
   collection       : null
   selfPublish      : true
   recordName       : 'Record'
@@ -15,11 +15,11 @@ class @ReactiveTable
   rowLink          : null
   tableCreateError : 'Error creating Table'
   fixedFooter      : false
-  
+
   # methodOnInsert   : 'insertTestDataRecord'
   # methodOnUpdate   : 'updateTestDataRecord'
   # methodOnRemove   : 'removeTestDataRecord'
-  
+
   downLoadPermissionsAndSelect: ->
     throw new Meteor.Error("accessError", "No Access")
 
@@ -27,14 +27,14 @@ class @ReactiveTable
   constructor: (@options = {}) ->
     if Meteor.isClient
       @dict = new ReactiveDict(@_dictName())
-    
+
     for key in ['methodOnInsert', 'methodOnUpdate', 'methodOnRemove', 'updateOk', 'insertOk', 'removeOk', 'removeAllOk']
       if @options?[key]?
         @[key] = @options[key]
 
     @setup()
 
-  
+
   _dictName: ->
     "reactiveTable_" + @_id()
 
@@ -50,11 +50,11 @@ class @ReactiveTable
   countName: ->
     @name() + 'Count'
 
-  
+
   publicationName: ->
     'reactiveTable_publish_' + @name()
 
-  
+
   pubSelectFilter: (select, pub) ->
     select
 
@@ -63,6 +63,7 @@ class @ReactiveTable
   publishser: (pub, select, sort, limit, skip) =>
     select = @pubSelectFilter(select, pub)
     if select?
+      @unblock?()
       if @countName()
         publishCount pub, @countName(), @collection.find(select),
           noReady: true
@@ -80,26 +81,26 @@ class @ReactiveTable
     if Meteor.isServer
       if @selfPublish
         publishFunc = @publishser
-    
+
         Meteor.publish @publicationName(), (select, sort, limit, skip) ->
           console.log("publish via ReactiveTable", name, select, sort, limit, skip) if DEBUG
           check(select, Match.Optional(Match.OneOf(Object, null)))
           check(sort, Match.Optional(Match.OneOf(Object, null)))
           check(skip, Match.Optional(Match.OneOf(Number, null)))
           check(limit, Match.Optional(Match.OneOf(Number, null)))
-          
+
           publishFunc(@, select, sort, limit, skip)
 
 
     meths = {}
-    
+
     #if true #@doDownloadLink
     meths["reactiveTable_" + name + "_getCSV"] = (select = {}, fields = {}, limit, downloadHeaders) =>
       check(select, Object)
       check(fields, Object)
       select = @downLoadPermissionsAndSelect?(select) or select
       console.log("reactiveTable getCSV", name, JSON.stringify(select), limit, @schema, headers) if DEBUG
-      
+
       if Meteor.isServer
         csv = '' #[]
         fieldKeys = _.keys(fields)
@@ -123,7 +124,7 @@ class @ReactiveTable
               value = rec
               for subElement in subElements
                 value = value?[subElement]
-              
+
               if typeof value is 'object'
                 value = JSON.stringify(value)
               if typeof value is 'string'
@@ -136,7 +137,7 @@ class @ReactiveTable
           console.log("eactiveTable getCSV no data", select, collection.find)
         console.log("reactiveTable getCSV return string length #{csv.length}") if DEBUG
         csv #.join("\n")
-            
+
     Meteor.methods meths
 
 
@@ -174,14 +175,14 @@ class @ReactiveTableInstance
     formTemplate    : 'reactiveTableForm'
     errorMessage    : ''
     cursor          : null
-    
+
     _subscriptionComplete: false
 
 
   constructor: (tableClass, options = {}) ->
     @collection = tableClass.collection
     @name = tableClass.name()
-    
+
     console.log("ReactiveTable constructor", @, @collection) if DEBUG
 
     @options = _.defaults(options, _.omit(tableClass, ['setUp', 'newTable']), @defaults)
@@ -405,7 +406,7 @@ class @ReactiveTableInstance
         updateOk: @updateOk(record)
         removeOk: @removeOk(record)
         #extraControls: @extraControls?(record)
-    
+
     recordsData
 
 
@@ -486,7 +487,7 @@ class @ReactiveTableInstance
       @set('filterColumn', col)
       @set('filterValue', '')
       @set('skip', 0)
-      
+
 
 
   setFilterValue: (value) ->
@@ -494,12 +495,12 @@ class @ReactiveTableInstance
     if @get('filterValue') isnt value
       @set('filterValue', value)
       @set('skip', 0)
-      
+
 
   filterValue: ->
     @get('filterValue')
 
-    
+
   filterType: ->
     filterColumn = @get('filterColumn')
     if filterColumn?
@@ -534,11 +535,11 @@ class @ReactiveTableInstance
   recordsName: ->
     @options.recordsName or @recordName()+'s'
 
-  
+
   colToUseForName: ->
     @options.colToUseForName or '_id'
-  
-  
+
+
   # CRUD
 
   checkFields: (rec, type="insert") ->
@@ -583,7 +584,7 @@ class @ReactiveTableInstance
           fullscreen: Meteor.isCordova
           fixedFooter: @fixedFooter
           #fixedFooter: true
-  
+
 
   insertRecord: (error, rtn) =>
     if error
@@ -714,7 +715,5 @@ class @ReactiveTableInstance
         fields[dataKey] = 1
 
     console.log("downloadRecords", @name, select, fields, limit) #if DEBUG
-    
+
     Meteor.call "reactiveTable_" + @name + "_getCSV", select, fields, limit, headers, callback
-
-
