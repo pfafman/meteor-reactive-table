@@ -343,6 +343,7 @@ class @ReactiveTableInstance
         rtn.push
           key: key
           dataKey: dataKey
+          iconHeader: col.iconHeader
           colName: colName
           column: col
           noSort: col.noSort

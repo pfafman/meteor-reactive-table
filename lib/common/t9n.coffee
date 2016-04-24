@@ -11,6 +11,7 @@ en =
   'TRUE': 'TRUE'
   'save': 'save'
   'edit': 'edit'
+  'Reverse sort order': 'Reverse sort order'
   
 
 T9n.map "en", en

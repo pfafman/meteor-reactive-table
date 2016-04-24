@@ -2,15 +2,15 @@
 <template name="reactiveTable">
   <div class="reactive-table">
     {{#if haveTable}}
-      
-      {{> reactiveTableHeading}} 
+
+      {{> reactiveTableHeading}}
 
       {{#if showFilter}}
         {{> reactiveTableFilter}}
       {{/if}}
-              
+
       {{#if haveData}}
-       
+
         {{> reactiveTableNav}}
 
         <div class="reactive-table-container {{tableContainerClass}}" style="{{style}}">
@@ -26,7 +26,7 @@
             </tbody>
           </table>
         </div>
-        
+
       {{else}}
         {{#unless firstReady}}
           {{> reactiveTableLoading}}
@@ -68,7 +68,7 @@
 
       {{#if options.doDownloadLink}}
         <button id="download-records" class="btn {{options.downloadButtonColor}} waves-effect waves-light">
-          <i class="material-icons left">cloud_download</i> 
+          <i class="material-icons left">cloud_download</i>
           Download
         </button>
       {{/if}}
@@ -93,7 +93,7 @@
 
 <template name="reactiveTableNav">
   <div class="reactive-nav">
-    
+
     {{#if showNavCount}}
       Displaying {{recordCountStart}} - {{recordCountEnd}} of
     {{/if}}
@@ -103,7 +103,7 @@
       <a href="" class="page-down {{#if pageDownDisable}}disabled{{/if}}">{{{pageDownSymbol}}}</a>
       <a href="" class="page-up {{#if pageUpDisable}}disabled{{/if}}">{{{pageUpSymbol}}}</a>
     </span>
-    
+
   </div>
 
 </template>
@@ -123,14 +123,22 @@
   <th class="{{column.class}}" style="{{column.style}}">
     {{#if noSort}}
       <button class="btn-flat waves-effect table-col-head" disabled="disabled">
-        {{capitalize colName}}
+        {{#if iconHeader}}
+          {{{iconHeader}}}
+        {{else}}
+          {{capitalize colName}}
+        {{/if}}
       </button>
     {{else}}
       <a class="btn-flat waves-effect table-col-head tooltipped"
         data-tooltip="{{#if sort}}Reverse sort order{{else}}Sort on {{capitalize colName}}{{/if}}"
         rel='tooltip'>
-        {{capitalize colName}}
-        {{#if sort}} 
+        {{#if iconHeader}}
+          {{{iconHeader}}}
+        {{else}}
+          {{capitalize colName}}
+        {{/if}}
+        {{#if sort}}
           {{{sortArrow}}}
         {{/if}}
       </a>
@@ -172,8 +180,8 @@
   <td class="controls rowlink-skip">
 
     {{#if ../options.showJSON}}
-      <a 
-        class="tooltipped show-record modal-trigger" 
+      <a
+        class="tooltipped show-record modal-trigger"
         data-tooltip="Show Record Object"
         data-position="left"
         rel='tooltip'
@@ -185,13 +193,13 @@
 
     {{#if updateOk}}
       {{#if ../options.updateRoute}}
-        <a href="{{pathFor ../options.updateRoute}}" 
+        <a href="{{pathFor ../options.updateRoute}}"
           class="{{../options.editClass}} tooltipped"
           data-tooltip='Edit Record' rel='tooltip'>
           <i class="material-icons">mode_edit</i>
         </a>
       {{else}}
-        <a href="" 
+        <a href=""
           class="{{../options.editClass}} reactive-table-edit-record tooltipped"
           data-tooltip='Edit Record' rel='tooltip'>
           <i class="material-icons">mode_edit</i>
@@ -241,5 +249,3 @@
     </div>
   </div>
 </template>
-
-
