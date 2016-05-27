@@ -1,17 +1,17 @@
 
-DEBUG = false
-
+DEBUG        = false
+DEBUG_TIMING = true
 
 #########################
 # reactiveTable template
 #
 
 Template.reactiveTable.onCreated ->
-  console.log('reactiveTable onCreated', @data) if DEBUG
+  console.log('reactiveTable onCreated', @data) if DEBUG or DEBUG_TIMING
   table = @data
 
   @firstReady = new ReactiveVar(false)
-
+  
   if table?.publicationName?()?
     if table.noSub
       console.log("NO SUB", @) if DEBUG
@@ -19,10 +19,12 @@ Template.reactiveTable.onCreated ->
     else
       console.log("DO SUB", @) if DEBUG
       @autorun =>
-        console.log("subscribe", table.publicationName?()) if DEBUG
-        @subscribe table.publicationName(), table.select(), table.sort(), table.limit(), table.skip(), =>
+        timer = moment()
+        console.log("reactiveTable: subscribe #{table.publicationName?()}", table.select(), table.sort(), table.limit(), table.skip()) if DEBUG or DEBUG_TIMING
+        
+        @sub = @subscribe table.publicationName(), table.select(), table.sort(), table.limit(), table.skip(), =>
           @firstReady.set(true)
-
+          console.log("reactiveTable: subscription ready #{table.publicationName?()}, #{(moment().diff(timer)/1000).toFixed(2)}") if DEBUG or DEBUG_TIMING
 
 
 Template.reactiveTable.onRendered ->
@@ -45,8 +47,8 @@ Template.reactiveTable.helpers
 
 
   haveData: ->
-    console.log("haveData", @recordCount()) if DEBUG
-    @recordCount() > 0
+    console.log("haveData #{@recordCount()} #{@records().length}") if DEBUG
+    @recordCount() > 0 or @records()?.length > 0
 
 
   style: ->

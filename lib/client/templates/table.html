@@ -31,11 +31,15 @@
         {{#unless firstReady}}
           {{> reactiveTableLoading}}
         {{else}}
-          <div class="reactive-table-container {{tableContainerClass}}" style="{{style}}">
-            <div class="reactive-table-no-records">
-              {{noRecordsText}}
+          {{#if Template.subscriptionsReady}}
+            <div class="reactive-table-container {{tableContainerClass}}" style="{{style}}">
+              <div class="reactive-table-no-records">
+                {{noRecordsText}}
+              </div>
             </div>
-          </div>
+          {{else}}
+            {{> reactiveTableLoading}}
+          {{/if}}
         {{/unless}}
       {{/if}}
 
