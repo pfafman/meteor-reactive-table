@@ -1,6 +1,13 @@
 
 DEBUG        = false
-DEBUG_TIMING = true
+DEBUG_TIMING = false
+
+# { checkNpmVersions } = require 'meteor/tmeasday:check-npm-versions'
+
+# checkNpmVersions
+#   'file-saver': '^1.2.2'
+
+# saveAs = new require('file-saver')
 
 #########################
 # reactiveTable template
@@ -152,7 +159,7 @@ Template.reactiveTableHeading.events
         Materialize.toast("Error getting CSV to download", 3000, 'toast-error')
         console.log("Error getting CSV", error)
       else if csv
-        console.log("Doing saveAs for CSV") if DEBUG
+        console.log("Doing saveAs for CSV", saveAs) if DEBUG
         blob = new Blob [csv],
           type: "text/csv"
         saveAs?(blob, filename)
