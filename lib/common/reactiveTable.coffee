@@ -15,7 +15,8 @@ class @ReactiveTable
   rowLink          : null
   tableCreateError : 'Error creating Table'
   fixedFooter      : false
-
+  largeCollection  : false
+  
   # methodOnInsert   : 'insertTestDataRecord'
   # methodOnUpdate   : 'updateTestDataRecord'
   # methodOnRemove   : 'removeTestDataRecord'
@@ -28,7 +29,7 @@ class @ReactiveTable
     if Meteor.isClient
       @dict = new ReactiveDict(@_dictName())
 
-    for key in ['methodOnInsert', 'methodOnUpdate', 'methodOnRemove', 'updateOk', 'insertOk', 'removeOk', 'removeAllOk']
+    for key in ['methodOnInsert', 'methodOnUpdate', 'methodOnRemove', 'updateOk', 'insertOk', 'removeOk', 'removeAllOk', 'largeCollection']
       if @options?[key]?
         @[key] = @options[key]
 
@@ -64,13 +65,21 @@ class @ReactiveTable
     select = @pubSelectFilter(select, pub)
     if select?
       @unblock?()
+      rtn = []
       if @countName()
-        publishCount pub, @countName(), @collection.find(select),
-          noReady: true
-      @collection.find select,
+        options =
+          fields:
+            _id: 1
+        if @largeCollection
+          rtn.push(new Counter(@countName(), @collection.find(select, options)))
+        else
+          publishCount pub, @countName(), @collection.find(select, options),
+            noReady: true
+      rtn.push @collection.find select,
         sort: sort
         limit: limit
         skip: skip
+      rtn
     else
       pub.ready()
 
@@ -205,6 +214,7 @@ class @ReactiveTableInstance
       'downLoadPermissionsAndSelect'
       'fixedFooter'
       'noSub'
+      'largeCollection'
     ]
 
     for key in optionKeys
@@ -357,8 +367,11 @@ class @ReactiveTableInstance
 
 
   recordCount: ->
+    console.log("recordCount", @options.countName(), @largeCollection) if DEBUG
     if @options.noSub
       @collection.find().count()
+    else if @largeCollection
+      Counter.get(@options.countName())
     else
       Counts.get(@options.countName())
 

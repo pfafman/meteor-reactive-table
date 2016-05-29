@@ -99,15 +99,15 @@ Template.reactiveTableNav.helpers
 
 
   recordCountStart: ->
-    @skip() + 1
+    (@skip() + 1).toLocaleString()
 
 
   recordCountEnd: ->
-    Math.min(@skip() + @limit(), @recordCount())
+    Math.min(@skip() + @limit(), @recordCount()).toLocaleString()
 
 
   recordCountDisplay: ->
-    @recordCount() + " " + @recordsName()
+    @recordCount().toLocaleString() + " " + @recordsName()
 
 
 
