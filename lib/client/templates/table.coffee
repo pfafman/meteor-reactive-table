@@ -1,6 +1,6 @@
 
 DEBUG        = false
-DEBUG_TIMING = true
+DEBUG_TIMING = false
 
 #########################
 # reactiveTable template
