@@ -216,7 +216,7 @@ Template.reactiveTableBody.helpers
 #
 
 Template.reactiveTableRow.onRendered ->
-  @$('.modal-trigger').leanModal()
+  @$('.modal-trigger').modal()
   @$('[rel="tooltip"]').tooltip()
 
 
