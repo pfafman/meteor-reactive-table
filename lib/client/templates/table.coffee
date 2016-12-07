@@ -216,7 +216,7 @@ Template.reactiveTableBody.helpers
 #
 
 Template.reactiveTableRow.onRendered ->
-  @$('.modal-trigger').modal()
+  @$('.modal').modal()
   @$('[rel="tooltip"]').tooltip()
 
 
@@ -255,3 +255,5 @@ Template.reactiveTableRow.events
     tmpl.$('[rel="tooltip"]').tooltip('')
     Template.parentData(1).onUpdateRecord?(@)
     tmpl.$('[rel="tooltip"]').tooltip('')
+
+
