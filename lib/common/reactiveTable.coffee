@@ -134,7 +134,9 @@ class @ReactiveTable
               for subElement in subElements
                 value = value?[subElement]
 
-              if typeof value is 'object'
+              if value instanceof Date
+                value = JSON.stringify(value).replace(/\"/g, '')
+              else if typeof value is 'object'
                 value = JSON.stringify(value)
               if typeof value is 'string'
                 value = value.replace(/\"/g, "'")
