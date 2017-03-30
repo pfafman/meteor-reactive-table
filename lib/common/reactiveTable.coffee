@@ -104,7 +104,6 @@ class @ReactiveTable
 
     meths = {}
 
-    #if true #@doDownloadLink
     meths["reactiveTable_" + name + "_getCSV"] = (select = {}, fields = {}, limit, downloadHeaders) =>
       check(select, Object)
       check(fields, Object)
@@ -734,7 +733,7 @@ class @ReactiveTableInstance
         dataKey = col.dataKey or col.sortKey or key
         fields[dataKey] = 1
 
-    console.log("downloadRecords", @name, select, fields, limit) #if DEBUG
+    console.log("downloadRecords", @name, select, fields, limit) if DEBUG
 
     Meteor.call "reactiveTable_" + @name + "_getCSV", select, fields, limit, headers, callback
 
