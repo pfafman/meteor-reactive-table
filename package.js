@@ -7,7 +7,7 @@ Package.describe({
 });
 
 Package.on_use(function (api, where) {
-  api.versionsFrom('1.3.1');
+  api.versionsFrom('1.3.2');
 
   // Client
   api.use(

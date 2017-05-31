@@ -126,13 +126,13 @@
 <template name="reactiveTableHeader">
   <th class="{{column.class}}" style="{{column.style}}">
     {{#if noSort}}
-      <button class="btn-flat waves-effect table-col-head" disabled="disabled">
+      <a class="btn-flat waves-effect table-col-head" disabled="disabled">
         {{#if iconHeader}}
           {{{iconHeader}}}
         {{else}}
           {{capitalize colName}}
         {{/if}}
-      </button>
+      </a>
     {{else}}
       <a class="btn-flat waves-effect table-col-head tooltipped"
         data-tooltip="{{#if sort}}Reverse sort order{{else}}Sort on {{capitalize colName}}{{/if}}"
