@@ -21,6 +21,7 @@ class @ReactiveTable
   # methodOnUpdate   : 'updateTestDataRecord'
   # methodOnRemove   : 'removeTestDataRecord'
 
+
   downLoadPermissionsAndSelect: ->
     throw new Meteor.Error("accessError", "No Access")
 
@@ -103,7 +104,6 @@ class @ReactiveTable
 
     meths = {}
 
-    #if true #@doDownloadLink
     meths["reactiveTable_" + name + "_getCSV"] = (select = {}, fields = {}, limit, downloadHeaders) =>
       check(select, Object)
       check(fields, Object)
@@ -126,13 +126,16 @@ class @ReactiveTable
         cursor = collection.find?(select, options)
         console.log("reactiveTable getCSV count", cursor?.count())
         if cursor?.forEach?
-          cursor.forEach (rec) ->
+          cursor.forEach (rec) =>
             row = []
             for fieldKey in fieldKeys
-              subElements = fieldKey.split('.')
-              value = rec
-              for subElement in subElements
-                value = value?[subElement]
+              if @schema[fieldKey].valueFunc?
+                value = @schema[fieldKey].valueFunc(rec[fieldKey], rec)
+              else
+                subElements = fieldKey.split('.')
+                value = rec
+                for subElement in subElements
+                  value = value?[subElement]
 
               if value instanceof Date
                 value = JSON.stringify(value).replace(/\"/g, '')
@@ -730,6 +733,9 @@ class @ReactiveTableInstance
         dataKey = col.dataKey or col.sortKey or key
         fields[dataKey] = 1
 
-    console.log("downloadRecords", @name, select, fields, limit) #if DEBUG
+    console.log("downloadRecords", @name, select, fields, limit) if DEBUG
 
     Meteor.call "reactiveTable_" + @name + "_getCSV", select, fields, limit, headers, callback
+
+
+
