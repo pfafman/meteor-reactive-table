@@ -8,11 +8,6 @@ capitalize = (string) ->
 Template.reactiveTableFormItem.onRendered ->
   #console.log("reactiveTableFormItem rendered")
   @$('[rel="tooltip"]').tooltip()
-  @$('.datepicker')?.pickadate
-    selectMonths: false
-    selectYears: false
-    hiddenName: true
-    formatSubmit: 'yyyy-mm-dd'
   #$('.timepicker')?.pickatime()
 
 
@@ -61,8 +56,18 @@ Template.reactiveTableFormSelect.onRendered ->
   @$('select').material_select()
 
 
+Template.reactiveTableFormDate.onRendered ->
+  console.log("reactiveTableFormDate onRendered", @) if DEBUG
+  @$('.datepicker')?.pickadate
+    selectMonths: false
+    selectYears: false
+    hiddenName: true
+    formatSubmit: 'yyyy-mm-dd'
+
+
 Template.reactiveTableFormDate.helpers
   dateValue: ->
+    console.log("reactiveTableFormDate #{moment(@value).format('YYYY-MM-DD')}", @value) if DEBUG
     if @value
-      moment(@value).format('D MMMM, YYYY')
+      moment(@value).format('YYYY-MM-DD')
 
