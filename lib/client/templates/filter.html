@@ -12,20 +12,23 @@
         {{/each}}
       </select>
     </div>
-
-    <div class="input-field col s4 filter-value-col">
-      {{#if isBool}}
+    
+    {{#if isBool}}
+      <div class="col s4 filter-value-col-bool">
         <span class="form-control">
           <input type="checkbox" id="filter-value" checked="{{checked}}" />
           <label for="filter-value">{{irtblT9nit "TRUE"}}</label>
         </span>
-      {{else}}
-      <input type="{{filterType}}" id="filter-value" class="form-control"
-        autocomplete="off" spellcheck="false"
-        placeholder="Text to filter on" value="{{filterValue}}" />
-      {{/if}}
+      </div>
+    {{else}}
+      <div class="input-field col s4 filter-value-col">
+        <input type="{{filterType}}" id="filter-value" class="form-control"
+          autocomplete="off" spellcheck="false"
+          placeholder="Text to filter on" value="{{filterValue}}" />
+      </div>
+    {{/if}}
         
-    </div>
+    
 
   </div>
 </template>
