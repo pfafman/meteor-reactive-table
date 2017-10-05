@@ -129,7 +129,7 @@ class @ReactiveTable
           cursor.forEach (rec) =>
             row = []
             for fieldKey in fieldKeys
-              if @schema[fieldKey].valueFunc?
+              if @schema[fieldKey]?.valueFunc?
                 value = @schema[fieldKey].valueFunc(rec[fieldKey], rec)
               else
                 subElements = fieldKey.split('.')
