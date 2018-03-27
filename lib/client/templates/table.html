@@ -158,25 +158,7 @@
 
 <template name="reactiveTableRow">
   {{#each colData}}
-    <td class="{{column.class}} {{rowLinkSkip}}" style="{{column.style}}">
-      {{#if aLink}}
-          <a href="{{aLink}}" class="{{#if title}}tooltipped{{/if}}" data-tooltip="{{#if title}}{{title}}{{/if}}" rel='{{#if title}}tooltip{{/if}}' target="{{column.target}}">
-              {{#if template}}
-                {{> Template.dynamic template=template}}
-              {{else}}
-                <div class="reactive-table-value"
-                contenteditable="{{contenteditable}}">{{{value}}}</div>
-              {{/if}}
-          </a>
-      {{else}}
-          {{#if template}}
-            {{> Template.dynamic template=template}}
-          {{else}}
-            <div class="reactive-table-value"
-            contenteditable="{{contenteditable}}">{{{value}}}</div>
-          {{/if}}
-      {{/if}}
-    </td>
+    {{> reactiveTableCell}}
   {{/each}}
   <td class="controls rowlink-skip">
 
@@ -228,6 +210,29 @@
       </div>
     </div>
   {{/if}}
+</template>
+
+
+<template name="reactiveTableCell">
+   <td class="{{column.class}} {{rowLinkSkip}}" style="{{column.style}}">
+    {{#if aLink}}
+        <a href="{{aLink}}" class="{{#if title}}tooltipped{{/if}}" data-tooltip="{{#if title}}{{title}}{{/if}}" rel='{{#if title}}tooltip{{/if}}' target="{{column.target}}">
+            {{#if template}}
+              {{> Template.dynamic template=template}}
+            {{else}}
+              <div class="reactive-table-value"
+              contenteditable="{{contenteditable}}">{{{value}}}</div>
+            {{/if}}
+        </a>
+    {{else}}
+        {{#if template}}
+          {{> Template.dynamic template=template}}
+        {{else}}
+          <div class="reactive-table-value"
+          contenteditable="{{contenteditable}}">{{{value}}}</div>
+        {{/if}}
+    {{/if}}
+  </td>
 </template>
 
 

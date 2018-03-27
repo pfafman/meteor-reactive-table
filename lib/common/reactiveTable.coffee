@@ -245,7 +245,7 @@ class @ReactiveTableInstance
       @reset()
 
     if Router.current().params?.query?.filterColumn and Router.current().params.query.filterValue
-      console.log("Query has filter on it", Router.current().params.query)
+      console.log("Query has filter on it", Router.current().params.query) if DEBUG
       @set("filterColumn", Router.current().params.query.filterColumn)
       @set("filterValue", Router.current().params.query.filterValue)
 
@@ -709,7 +709,7 @@ class @ReactiveTableInstance
         recName = "?"
       MaterializeModal.confirm
         title: "Delete #{@recordName()}"
-        message: "Are you sure you want to delete #{@recordName()}#{recName}"
+        message: "Are you sure you want to delete #{@recordName()}#{recName} #{@options.removeMessage}"
         callback: (error, rtn) =>
           if error
             Materialize.toast("Error on delete: #{error.reason}", 4000, 'toast-error')

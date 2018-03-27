@@ -257,3 +257,11 @@ Template.reactiveTableRow.events
     tmpl.$('[rel="tooltip"]').tooltip('')
 
 
+
+Template.reactiveTableCell.onRendered ->
+  @$('.modal').modal()
+  @$('[rel="tooltip"]').tooltip()
+
+
+Template.reactiveTableCell.onDestroyed ->
+  @$('[rel="tooltip"]').tooltip('remove')
