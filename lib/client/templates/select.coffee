@@ -40,17 +40,20 @@ Template.reactiveTableOptions.helpers
               key: elm.key
               val: elm.val
               selected: if @value is elm.val then 'selected'
+              disabled: "disabled" if elm.disabled
           else
             rtn.push
               key: elm
               val: elm
               selected: if @value is elm then 'selected'
+              disabled: "disabled" if elm.disabled
       else if _.isObject(select)
         for key, val of select
           rtn.push
             key: key
             val: val
             selected: if @value is key then 'selected'
+            #disabled: elm.disabled
       rtn
 
 
