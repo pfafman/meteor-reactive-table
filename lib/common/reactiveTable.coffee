@@ -707,9 +707,12 @@ class @ReactiveTableInstance
         recName = " <i>#{rec.recordName}</i>?"
       else
         recName = "?"
+      removeMessage = ""
+      if @options?.removeMessage
+        removeMessage = @options.removeMessage
       MaterializeModal.confirm
         title: "Delete #{@recordName()}"
-        message: "Are you sure you want to delete #{@recordName()}#{recName} #{@options.removeMessage}"
+        message: "Are you sure you want to delete #{@recordName()}#{recName} #{removeMessage}"
         callback: (error, rtn) =>
           if error
             Materialize.toast("Error on delete: #{error.reason}", 4000, 'toast-error')
