@@ -279,7 +279,10 @@ class @ReactiveTableInstance
 
   sort: ->
     sort = {}
-    sort[@get('sortColumn')] = @get('sortDirection')
+    sortCols = @get('sortColumn').split(',')
+    for sortCol in sortCols
+      sort[sortCol] = @get('sortDirection')
+    console.log("Sort", sort) #if DEBUG
     sort
 
 
@@ -700,6 +703,7 @@ class @ReactiveTableInstance
 
 
   onRemoveRecord: (rec) ->
+    console.log("onRemoveRecord", rec) if DEBUG
     if @options.onRemoveRecord?  and typeof @options.onRemoveRecord is 'function'
       @options.onRemoveRecord(rec)
     else
