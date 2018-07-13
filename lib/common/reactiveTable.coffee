@@ -282,7 +282,7 @@ class @ReactiveTableInstance
     sortCols = @get('sortColumn').split(',')
     for sortCol in sortCols
       sort[sortCol] = @get('sortDirection')
-    console.log("Sort", sort) #if DEBUG
+    console.log("Sort", sort) if DEBUG
     sort
 
 
