@@ -279,7 +279,10 @@ class @ReactiveTableInstance
 
   sort: ->
     sort = {}
-    sort[@get('sortColumn')] = @get('sortDirection')
+    sortCols = @get('sortColumn').split(',')
+    for sortCol in sortCols
+      sort[sortCol] = @get('sortDirection')
+    console.log("Sort", sort) if DEBUG
     sort
 
 
