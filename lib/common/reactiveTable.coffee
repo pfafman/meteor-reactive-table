@@ -285,6 +285,7 @@ class @ReactiveTableInstance
     console.log("Sort", sort) if DEBUG
     sort
 
+#???
 
   select: ->
     select = _.extend({}, @get('select'))
