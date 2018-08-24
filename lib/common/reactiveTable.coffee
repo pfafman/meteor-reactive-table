@@ -155,7 +155,7 @@ class @ReactiveTable
     Meteor.methods meths
 
 
-  newTable: (options = {}) ->
+  newTable: (options = {}) =>
     new ReactiveTableInstance(@, options)
 
 
@@ -199,7 +199,16 @@ class @ReactiveTableInstance
 
     console.log("ReactiveTable constructor", @, @collection) if DEBUG
 
-    @options = _.defaults(options, _.omit(tableClass, ['setUp', 'newTable']), @defaults)
+    @options = _.defaults(options, _.omit(tableClass, ['setUp', 'newTable']))
+
+    for key in Object.getOwnPropertyNames(Object.getPrototypeOf(tableClass))
+      if not @options[key] and key not in ['setUp', 'newTable']
+        @options[key] = tableClass[key]
+
+    @options = _.defaults(@options, @defaults)
+    
+    #console.log("tableClass:", tableClass,  Object.getPrototypeOf(tableClass), _.keys(Object.getPrototypeOf(tableClass)))
+    #console.log("options", @options, @options.countName?(), tableClass.countName?())
 
     throw new Error("ReactiveTable: must specify collection") unless @collection instanceof Mongo.Collection
 
@@ -274,7 +283,7 @@ class @ReactiveTableInstance
 
 
   publicationName: ->
-    @options.publicationName()
+    @options.publicationName?() # or tableClass.publicationName?()
 
 
   sort: ->
