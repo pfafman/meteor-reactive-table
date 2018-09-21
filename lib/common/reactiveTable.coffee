@@ -68,6 +68,7 @@ class @ReactiveTable
       @unblock?()
       rtn = []
       if @countName()
+        console.log("publisher", @countName())
         options =
           fields:
             _id: 1
@@ -88,12 +89,13 @@ class @ReactiveTable
   setup: ->
     collection = @collection
     name = @name()
+    console.log("reactiveTable set up for #{name}", @selfPublish) if DEBUG
     if Meteor.isServer
       if @selfPublish
         publishFunc = @publishser
-
+        console.log("reactiveTable set up publication", @publicationName(), @countName()) #if DEBUG
         Meteor.publish @publicationName(), (select, sort, limit, skip) ->
-          console.log("publish via ReactiveTable", name, select, sort, limit, skip) if DEBUG
+          console.log("publish via ReactiveTable", name, select, sort, limit, skip) #if DEBUG
           check(select, Match.Optional(Match.OneOf(Object, null)))
           check(sort, Match.Optional(Match.OneOf(Object, null)))
           check(skip, Match.Optional(Match.OneOf(Number, null)))
@@ -199,16 +201,28 @@ class @ReactiveTableInstance
 
     console.log("ReactiveTable constructor", @, @collection) if DEBUG
 
-    @options = _.defaults(options, _.omit(tableClass, ['setUp', 'newTable']))
+    @options = Object.create(tableClass)
+    delete @options.setUp
+    delete @options.newTable
 
-    for key in Object.getOwnPropertyNames(Object.getPrototypeOf(tableClass))
-      if not @options[key] and key not in ['setUp', 'newTable']
-        @options[key] = tableClass[key]
+    for key, val of options
+      @options[key] = val
 
-    @options = _.defaults(@options, @defaults)
+    for key, val of @defaults
+      if not @options[key]?
+        @options[key] = val
+
+    #@options = _.defaults(options, temp)
+
+    # Fix for the above is not copying all the properties
+    # for key in Object.getOwnPropertyNames(Object.getPrototypeOf(tableClass))
+    #   if not @options[key] and key not in ['setUp', 'newTable']
+    #     @options[key] = tableClass[key]
+
+    #@options = _.defaults(@options, @defaults)
     
     #console.log("tableClass:", tableClass,  Object.getPrototypeOf(tableClass), _.keys(Object.getPrototypeOf(tableClass)))
-    #console.log("options", @options, @options.countName?(), tableClass.countName?())
+    console.log("options", @options, @options.countName?(), tableClass.countName?()) if DEBUG
 
     throw new Error("ReactiveTable: must specify collection") unless @collection instanceof Mongo.Collection
 
@@ -384,7 +398,7 @@ class @ReactiveTableInstance
 
 
   recordCount: ->
-    console.log("recordCount", @options.countName(), @largeCollection) if DEBUG
+    console.log("recordCount", @options?.countName?(), @largeCollection, @options) if DEBUG
     if @options.noSub
       @collection.find().count()
     else if @largeCollection
