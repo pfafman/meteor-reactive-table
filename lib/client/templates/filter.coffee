@@ -8,7 +8,7 @@ Template.reactiveTableFilter.onCreated ->
 
 Template.reactiveTableFilter.onRendered ->
   console.log("reactiveTableFilter onRendered") if DEBUG
-  @$('select').material_select()
+  @$('select').formSelect()
 
 
 Template.reactiveTableFilter.onDestroyed ->

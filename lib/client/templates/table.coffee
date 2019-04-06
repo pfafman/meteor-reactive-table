@@ -36,11 +36,11 @@ Template.reactiveTable.onCreated ->
 
 Template.reactiveTable.onRendered ->
   console.log('reactiveTable onRendered') if DEBUG
-  @$('[rel="tooltip"]').tooltip()
+  @$('[rel="tooltip"]')?.tooltip()
 
 
 Template.reactiveTable.onDestroyed ->
-  @$('[rel="tooltip"]').tooltip('remove')
+  @$('[rel="tooltip"]')?.destroy?()
 
 
 Template.reactiveTable.helpers
@@ -173,11 +173,11 @@ Template.reactiveTableHeading.events
 #
 
 Template.reactiveTableHeader.onRendered ->
-  @$('[rel="tooltip"]').tooltip()
+  @$('[rel="tooltip"]')?.tooltip()
 
 
 Template.reactiveTableHeader.onDestroyed ->
-  @$('[rel="tooltip"]').tooltip('remove')
+  @$('[rel="tooltip"]')?.destroy?()
 
 
 Template.reactiveTableHeader.helpers
@@ -195,8 +195,7 @@ Template.reactiveTableHeader.helpers
 Template.reactiveTableHeader.events
   'click .table-col-head': (e, tmpl) ->
     e.preventDefault()
-    tmpl.$('[rel="tooltip"]').tooltip('remove')
-    tmpl.$('[rel="tooltip"]').tooltip()
+    tmpl.$('[rel="tooltip"]')?.close?()
     Template.parentData(1).setSort(@dataKey)
 
 
@@ -217,11 +216,11 @@ Template.reactiveTableBody.helpers
 
 Template.reactiveTableRow.onRendered ->
   @$('.modal').modal()
-  @$('[rel="tooltip"]').tooltip()
+  @$('[rel="tooltip"]')?.tooltip()
 
 
 Template.reactiveTableRow.onDestroyed ->
-  @$('[rel="tooltip"]').tooltip('remove')
+  @$('[rel="tooltip"]')?.destroy?()
 
 
 Template.reactiveTableRow.helpers
@@ -243,25 +242,23 @@ Template.reactiveTableRow.events
 
   'click .reactive-table-delete-record': (event, tmpl) ->
     console.log("delete", @,  Template.parentData(1)) if DEBUG
-    tmpl.$('[rel="tooltip"]').tooltip('remove')
-    tmpl.$('[rel="tooltip"]').tooltip('')
+    tmpl.$('[rel="tooltip"]')?.close?()
     Template.parentData(1).onRemoveRecord?(@)
-    tmpl.$('[rel="tooltip"]').tooltip('')
+    tmpl.$('[rel="tooltip"]')?.close?()
 
 
   'click .reactive-table-edit-record': (event, tmpl) ->
     console.log("edit: TODO: Enable Modal Edit?", @,  Template.parentData(1)) if DEBUG
-    tmpl.$('[rel="tooltip"]').tooltip('remove')
-    tmpl.$('[rel="tooltip"]').tooltip('')
+    tmpl.$('[rel="tooltip"]')?.close?()
     Template.parentData(1).onUpdateRecord?(@)
-    tmpl.$('[rel="tooltip"]').tooltip('')
+    tmpl.$('[rel="tooltip"]')?.close?()
 
 
 
 Template.reactiveTableCell.onRendered ->
   @$('.modal').modal()
-  @$('[rel="tooltip"]').tooltip()
+  @$('[rel="tooltip"]')?.tooltip()
 
 
 Template.reactiveTableCell.onDestroyed ->
-  @$('[rel="tooltip"]').tooltip('remove')
+  @$('[rel="tooltip"]')?.destroy?()

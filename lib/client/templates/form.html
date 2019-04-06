@@ -128,6 +128,7 @@
   </div>
 </template>
 
+
 <template name="reactiveTableFormTime">
   <div class="reactive-table-input-field">
     
@@ -154,30 +155,33 @@
   </div>
 </template>
 
+
 <template name="reactiveTableFormCheckbox">
   <div class="reactive-table-input-field">
-    <input 
-      class="reactive-table-checkbox {{#if tooltip}}tooltipped{{/if}}" 
-      type="checkbox" 
-      name="{{key}}"
-      id="{{key}}"
-      value="{{value}}"
-      required="{{required}}"
-      autofocus="{{autofocus}}"
-      placeholder="{{placeholder}}"
-      checked="{{checked}}"
-      data-tooltip="{{tooltip}}" 
-      rel='{{#if tooltip}}tooltip{{/if}}' 
-      data-position="{{#if tooltip}}right{{/if}}"
-      disabled="{{static}}" />
-      {{#if static}}
+    <label>
       <input 
-        type="hidden" 
+        class="reactive-table-checkbox {{#if tooltip}}tooltipped{{/if}}" 
+        type="checkbox" 
         name="{{key}}"
+        id="{{key}}"
         value="{{value}}"
-      />
-      {{/if}}
-    <label for="{{key}}">{{header}}</label>
+        required="{{required}}"
+        autofocus="{{autofocus}}"
+        placeholder="{{placeholder}}"
+        checked="{{checked}}"
+        data-tooltip="{{tooltip}}" 
+        rel='{{#if tooltip}}tooltip{{/if}}' 
+        data-position="{{#if tooltip}}right{{/if}}"
+        disabled="{{static}}" />
+        {{#if static}}
+        <input 
+          type="hidden" 
+          name="{{key}}"
+          value="{{value}}"
+        />
+        {{/if}}
+      <span for="{{key}}">{{header}}</span>
+    </label>
   </div>
 </template>
 

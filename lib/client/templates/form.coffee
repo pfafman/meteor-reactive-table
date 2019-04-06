@@ -3,16 +3,19 @@ DEBUG = false
 
 capitalize = (string) ->
   string.charAt(0).toUpperCase() + string.substring(1).toLowerCase()
-  
+
+
+Template.reactiveTableForm.onRendered ->
+  console.log("reactiveTableForm rendered") if DEBUG
+
 
 Template.reactiveTableFormItem.onRendered ->
   #console.log("reactiveTableFormItem rendered")
   @$('[rel="tooltip"]').tooltip()
-  #$('.timepicker')?.pickatime()
 
 
 Template.reactiveTableFormItem.onDestroyed ->
-  @$('[rel="tooltip"]').tooltip('remove')
+  @$('[rel="tooltip"]')?.destroy?()
 
 
 Template.reactiveTableFormItem.helpers
@@ -53,16 +56,22 @@ Template.reactiveTableFormItem.helpers
 
 
 Template.reactiveTableFormSelect.onRendered ->
-  @$('select').material_select()
+  console.log("reactiveTableFormSelect: init select") if DEBUG
+  @$('select').formSelect()
+  # instance = M.FormSelect.init @find('select'),
+  #   dropdownOptions:
+  #     coverTrigger: false
 
 
 Template.reactiveTableFormDate.onRendered ->
   console.log("reactiveTableFormDate onRendered", @) if DEBUG
-  @$('.datepicker')?.pickadate
+  @$('.datepicker')?.datepicker
     selectMonths: false
     selectYears: false
     hiddenName: true
-    formatSubmit: 'yyyy-mm-dd'
+    format: 'yyyy-mm-dd'
+    #onOpen: ->
+    #  console.log("datepicker is open")
 
 
 Template.reactiveTableFormDate.helpers

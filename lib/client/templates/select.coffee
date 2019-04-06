@@ -6,7 +6,8 @@ Template.reactiveTableSelect.onCreated ->
 
 
 Template.reactiveTableSelectSelect.onRendered ->
-  @$('select').material_select()
+  console.log("reactiveTableSelectSelect: init select")
+  @$('select').formSelect()
 
 
 Template.reactiveTableSelect.helpers
