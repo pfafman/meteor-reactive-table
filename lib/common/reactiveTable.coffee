@@ -96,10 +96,10 @@ class @ReactiveTable
         console.log("reactiveTable set up publication", @publicationName(), @countName()) #if DEBUG
         Meteor.publish @publicationName(), (select, sort, limit, skip) ->
           console.log("publish via ReactiveTable", name, select, sort, limit, skip) #if DEBUG
-          check(select, Match.Optional(Match.OneOf(Object, null)))
-          check(sort, Match.Optional(Match.OneOf(Object, null)))
-          check(skip, Match.Optional(Match.OneOf(Number, null)))
-          check(limit, Match.Optional(Match.OneOf(Number, null)))
+          check(select, Match.Maybe(Object))
+          check(sort, Match.Maybe(Object))
+          check(skip, Match.Maybe(Number))
+          check(limit, Match.Maybe(Number))
 
           publishFunc(@, select, sort, limit, skip)
 
