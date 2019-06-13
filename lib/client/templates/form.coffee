@@ -55,6 +55,16 @@ Template.reactiveTableFormItem.helpers
     @helpText? and not @static?
 
 
+Template.reactiveTableFormInput.helpers
+  valueNotNull: ->
+    @value?
+
+
+Template.reactiveTableFormRange.helpers
+  valueNotNull: ->
+    @value?
+
+
 Template.reactiveTableFormSelect.onRendered ->
   console.log("reactiveTableFormSelect: init select") if DEBUG
   @$('select').formSelect()
