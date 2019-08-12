@@ -93,9 +93,9 @@ class @ReactiveTable
     if Meteor.isServer
       if @selfPublish
         publishFunc = @publishser
-        console.log("reactiveTable set up publication", @publicationName(), @countName()) #if DEBUG
+        console.log("reactiveTable set up publication", @publicationName(), @countName()) if DEBUG
         Meteor.publish @publicationName(), (select, sort, limit, skip) ->
-          console.log("publish via ReactiveTable", name, select, sort, limit, skip) #if DEBUG
+          console.log("publish via ReactiveTable", name, select, sort, limit, skip) if DEBUG
           check(select, Match.Maybe(Object))
           check(sort, Match.Maybe(Object))
           check(skip, Match.Maybe(Number))
@@ -126,8 +126,10 @@ class @ReactiveTable
         if limit
           options.limit = limit
         cursor = collection.find?(select, options)
-        console.log("reactiveTable getCSV count", cursor?.count())
+        console.log("reactiveTable getCSV count", cursor?.count(), options)  if DEBUG
         if cursor?.forEach?
+          count = 0
+          lineCount2gc = 0
           cursor.forEach (rec) =>
             row = []
             for fieldKey in fieldKeys
@@ -149,8 +151,14 @@ class @ReactiveTable
                 value = ''
               row.push '"' + value + '"'
             csv +=  row.join(',') + "\n" #.push row.join(',')
+            lineCount2gc++
+            if lineCount2gc >= 1000
+              count += lineCount2gc
+              console.log("reactiveTable:getCSV: Garbage Collect?", csv.length, count) if DEBUG
+              global?.gc?()
+              lineCount2gc = 0
         else
-          console.log("eactiveTable getCSV no data", select, collection.find)
+          console.log("reactiveTable getCSV no data", select, collection.find)
         console.log("reactiveTable getCSV return string length #{csv.length}") if DEBUG
         csv #.join("\n")
 
