@@ -68,7 +68,7 @@ class @ReactiveTable
       @unblock?()
       rtn = []
       if @countName()
-        console.log("publisher", @countName())
+        console.log("publisher", @countName()) if DEBUG
         options =
           fields:
             _id: 1
