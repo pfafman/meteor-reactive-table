@@ -29,7 +29,9 @@
       <input type="hidden" name="{{key}}" value="{{realValue}}" />
     {{/if}}
     
+    {{#unless noLabel}}
     <label for="{{#unless static}}{{key}}{{/unless}}" class="{{#if valueNotNull}}active{{/if}}">{{header}}</label>
+    {{/unless}}
     <input 
       type="{{displayType}}" 
       class="form-control 
