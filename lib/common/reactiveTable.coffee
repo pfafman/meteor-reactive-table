@@ -30,7 +30,15 @@ class @ReactiveTable
     if Meteor.isClient
       @dict = new ReactiveDict(@_dictName())
 
-    for key in ['methodOnInsert', 'methodOnUpdate', 'methodOnRemove', 'updateOk', 'insertOk', 'removeOk', 'removeAllOk', 'largeCollection']
+    for key in [
+      'methodOnInsert', 
+      'methodOnUpdate', 
+      'methodOnRemove', 
+      'updateOk', 
+      'insertOk', 
+      'removeOk', 
+      'removeAllOk', 
+      'largeCollection']
       if @options?[key]?
         @[key] = @options[key]
 
@@ -42,7 +50,7 @@ class @ReactiveTable
 
 
   _id: ->
-    @options.id or @collection?._name
+    @options.id or @id or @collection?._name
 
 
   name: ->
