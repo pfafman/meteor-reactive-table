@@ -70,7 +70,7 @@ class @ReactiveTable
 
 
   # Can overwrite
-  publishser: (pub, select, sort, limit, skip) =>
+  publisher: (pub, select, sort, limit, skip) =>
     select = @pubSelectFilter(select, pub)
     if select?
       @unblock?()
@@ -100,7 +100,7 @@ class @ReactiveTable
     console.log("reactiveTable set up for #{name}", @selfPublish) if DEBUG
     if Meteor.isServer
       if @selfPublish
-        publishFunc = @publishser
+        publishFunc = @publisher
         console.log("reactiveTable set up publication", @publicationName(), @countName()) if DEBUG
         Meteor.publish @publicationName(), (select, sort, limit, skip) ->
           console.log("publish via ReactiveTable", name, select, sort, limit, skip) if DEBUG

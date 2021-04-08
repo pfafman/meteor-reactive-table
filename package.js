@@ -2,7 +2,7 @@
 Package.describe({
   name: 'pfafman:reactive-table',
   summary: "Paging Table for Meteor",
-  version: "0.4.17",
+  version: "0.4.18",
   git: "https://github.com/pfafman/meteor-reactive-table.git",
 });
 
@@ -17,7 +17,7 @@ Package.on_use(function (api, where) {
     'templating',
     'reactive-dict',
     'less',
-    'tmeasday:check-npm-versions@0.3.1'
+    'tmeasday:check-npm-versions'
     ]
     , 'client');
 
@@ -34,7 +34,7 @@ Package.on_use(function (api, where) {
 
 
   api.imply([
-    'tmeasday:publish-counts@0.7.3',
+    'tmeasday:publish-counts',
   ], ["client", "server"]);
 
 
