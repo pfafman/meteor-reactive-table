@@ -31,14 +31,16 @@ class @ReactiveTable
       @dict = new ReactiveDict(@_dictName())
 
     for key in [
-      'methodOnInsert', 
-      'methodOnUpdate', 
-      'methodOnRemove', 
-      'updateOk', 
-      'insertOk', 
-      'removeOk', 
-      'removeAllOk', 
-      'largeCollection']
+      'methodOnInsert',
+      'methodOnUpdate',
+      'methodOnRemove',
+      'updateOk',
+      'insertOk',
+      'removeOk',
+      'removeAllOk',
+      'largeCollection'
+    ]
+
       if @options?[key]?
         @[key] = @options[key]
 

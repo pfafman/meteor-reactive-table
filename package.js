@@ -2,11 +2,11 @@
 Package.describe({
   name: 'pfafman:reactive-table',
   summary: "Paging Table for Meteor",
-  version: "0.4.18",
+  version: "0.4.19",
   git: "https://github.com/pfafman/meteor-reactive-table.git",
 });
 
-Package.on_use(function (api, where) {
+Package.onUse(function (api, where) {
   
   // Client
   api.use(
@@ -40,7 +40,7 @@ Package.on_use(function (api, where) {
 
   //api.imply('dburles:mongo-collection-instances');
 
-  api.add_files(
+  api.addFiles(
     [
     'lib/client/helpers.coffee',
     'lib/client/templates/table.html',
@@ -57,7 +57,7 @@ Package.on_use(function (api, where) {
     ]
     , 'client');
 
-  api.add_files(
+  api.addFiles(
     [
     'lib/common/reactiveTable.coffee',
     'lib/common/t9n.coffee',
@@ -67,6 +67,6 @@ Package.on_use(function (api, where) {
 });
 
 
-Package.on_test(function (api) {
+Package.onTest(function (api) {
 
 });
