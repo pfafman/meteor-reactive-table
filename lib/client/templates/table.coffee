@@ -224,9 +224,14 @@ Template.reactiveTableRow.onDestroyed ->
 
 
 Template.reactiveTableRow.helpers
-  json: ->
+  json: (options) ->
     if @colData?[0]?.record?
-      '<pre>' + JSON.stringify(@colData[0].record, null, 2) + '</pre>'
+      # Omit some fields?
+      fullRec = @colData[0].record
+      if options.omitShowJSON?.length >= 1
+        console.log("json",options.omitShowJSON) if DEBUG
+        fullRec = _.omit(fullRec, options.omitShowJSON)
+      '<pre>' + JSON.stringify(fullRec, null, 2) + '</pre>'
 
   rowLinkSkip: ->
     if @aLink
