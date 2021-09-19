@@ -638,7 +638,7 @@ class @ReactiveTableInstance
         Router.go(@newRecordPath)  # Should already be handled
       else
         console.log("formData", @formTemplate, @formData('insert')) if DEBUG
-        title =  @newRecordText or 'New ' + @recordsName().capitalize()
+        title =  @newRecordText or 'New ' + @recordName().capitalize()
         MaterializeModal.form
           bodyTemplate: @formTemplate
           title: title
