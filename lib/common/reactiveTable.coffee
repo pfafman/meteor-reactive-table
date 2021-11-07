@@ -684,10 +684,10 @@ class @ReactiveTableInstance
   onUpdateRecord: (rec) ->
     #@currentRecordId = rec._id
     console.log("onUpdateRecord", rec, @) if DEBUG
-    throw new Metoer.eror("badData", "No record Id") if not rec?._id
+    throw new Meteor.eror("badData", "No record Id") if not rec?._id
     @currentRecord = @collection.findOne
       _id: rec._id
-    throw new Metoer.eror("badData", "No record found to update") if not rec?._id
+    throw new Meteor.eror("badData", "No record found to update") if not rec?._id
     if @options?.onUpdateRecord? and typeof @options.onUpdateRecord is 'function'
       @options.onUpdateRecord(rec, @currentRecord)
     else
