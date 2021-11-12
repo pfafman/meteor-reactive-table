@@ -644,9 +644,19 @@ class @ReactiveTableInstance
           title: title
           columns: @formData('insert').columns
           callback: @insertRecord
+          submitable: @submitable
           fullscreen: Meteor.isCordova
           fixedFooter: @fixedFooter
           #fixedFooter: true
+
+
+  submitable: (rec) =>
+    console.log("submitable", rec) if DEBUG
+    if @insertOk(rec) and @checkFields(rec, 'insert')
+      true
+    else
+      Materialize.toast("Error could not save " + @recordName() + " " + @errorMessage, 3000, 'toast-error')
+      false
 
 
   insertRecord: (error, rtn) =>
