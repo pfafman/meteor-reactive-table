@@ -54,7 +54,7 @@ Template.reactiveTable.helpers
 
 
   haveData: ->
-    console.log("haveData #{@recordCount()} #{@records().length}") if DEBUG
+    console.log("haveData #{@recordCount()} #{@records()?.length}") if DEBUG
     @recordCount() > 0 or @records()?.length > 0
 
 
@@ -150,7 +150,7 @@ Template.reactiveTableHeading.events
 
 
   'click #download-records': (event, tmpl) ->
-    console.log("Download Records", tmpl, @) #if DEBUG
+    console.log("Download Records", tmpl, @) if DEBUG
 
     tableTitle = @tableTitle or @name or 'records'
     filename = tableTitle + '.csv'

@@ -131,8 +131,8 @@ class @ReactiveTable
           header = '"' + header.replace(/\"/g, "'") + '"'
           headers.push(header)
         csv += headers.join(',') + "\n"
-        options =
-          fields: fields
+        options = {}
+        #   fields: fields
         if limit
           options.limit = limit
         cursor = collection.find?(select, options)
@@ -176,6 +176,7 @@ class @ReactiveTable
 
 
   newTable: (options = {}) =>
+    console.log("newTable") if DEBUG
     new ReactiveTableInstance(@, options)
 
 
@@ -214,10 +215,11 @@ class @ReactiveTableInstance
 
 
   constructor: (tableClass, options = {}) ->
+    console.log("ReactiveTable constructor") #if DEBUG
     @collection = tableClass.collection
     @name = tableClass.name()
 
-    console.log("ReactiveTable constructor", @, @collection) if DEBUG
+    console.log("ReactiveTable constructor", @, @collection) #if DEBUG
 
     @options = Object.create(tableClass)
     delete @options.setUp
@@ -426,6 +428,7 @@ class @ReactiveTableInstance
 
 
   records: ->
+    console.log("records") #if DEBUG
     options =
       limit: @limit()
       sort: @sort()
