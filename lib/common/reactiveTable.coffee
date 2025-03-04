@@ -136,11 +136,11 @@ class @ReactiveTable
         if limit
           options.limit = limit
         cursor = collection.find?(select, options)
-        console.log("reactiveTable getCSV count", cursor?.count(), options)  if DEBUG
-        if cursor?.forEach?
+        console.log("reactiveTable getCSV count", await cursor?.countAsync(), options)  if DEBUG
+        if cursor?.forEachAsync?
           count = 0
           lineCount2gc = 0
-          cursor.forEach (rec) =>
+          await cursor.forEachAsync (rec) =>
             row = []
             for fieldKey in fieldKeys
               if @schema[fieldKey]?.valueFunc?

@@ -169,7 +169,7 @@ Template.reactiveTableHeading.events
         Materialize.toast("Error getting CSV to download", 3000, 'toast-error')
         console.log("Error getting CSV", error)
       else if csv
-        console.log("Doing saveAs for CSV", saveAs) if DEBUG
+        console.log("Doing saveAs for CSV", saveAs, csv) if DEBUG
         blob = new Blob [csv],
           type: "text/csv"
         saveAs?(blob, filename)
