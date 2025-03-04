@@ -84,7 +84,7 @@ Template.reactiveTableFormRange.helpers
 Template.reactiveTableFormSelect.onRendered ->
   console.log("reactiveTableFormSelect init select") if DEBUG
   #@$('select').formSelect()
-  instance = M.FormSelect.init @findAll('select'),
+  instance = M.FormSelect.init @$('select'),
     dropdownOptions:
       coverTrigger: false
 

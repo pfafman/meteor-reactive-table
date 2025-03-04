@@ -7,7 +7,7 @@ Template.reactiveTableSelect.onCreated ->
 
 Template.reactiveTableSelectSelect.onRendered ->
   console.log("reactiveTableSelectSelect init select")
-  @selectInstances = M.FormSelect.init(findAll('select'))
+  @selectInstances = M.FormSelect.init(@$('select'))
 
 
 Template.reactiveTableSelect.helpers
