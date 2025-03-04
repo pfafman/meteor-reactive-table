@@ -2,12 +2,22 @@
 DEBUG        = false
 DEBUG_TIMING = false
 
-# { checkNpmVersions } = require 'meteor/tmeasday:check-npm-versions'
 
-# checkNpmVersions
-#   'file-saver': '^1.2.2'
+initTooltip = (tmpl) ->
+  tmpl.$('[rel="tooltip"]')?.tooltip()
+  #tmpl.toolTips = M.Tooltip.init(tmpl.findAll('[rel="tooltip"]'))
 
-# saveAs = new require('file-saver')
+
+destroyTooltip = (tmpl) ->
+  tmpl.$('[rel="tooltip"]')?.destroy?()
+  #tmpl.toolTips?.forEach? (tip) ->
+  #    tip.destroy?()
+
+
+closeTooltip =  (tmpl) ->
+  tmpl.$('[rel="tooltip"]')?.close?()
+
+
 
 #########################
 # reactiveTable template
@@ -35,13 +45,13 @@ Template.reactiveTable.onCreated ->
 
 
 Template.reactiveTable.onRendered ->
-  console.log('reactiveTable onRendered') if DEBUG
-  @$('[rel="tooltip"]')?.tooltip()
+  initTooltip(@)
 
 
 Template.reactiveTable.onDestroyed ->
-  @$('[rel="tooltip"]')?.destroy?()
-
+  console.log('reactiveTable tooltips', @toolTips) if DEBUG
+  destroyTooltip(@)
+  
 
 Template.reactiveTable.helpers
 
@@ -54,7 +64,7 @@ Template.reactiveTable.helpers
 
 
   haveData: ->
-    console.log("haveData #{@recordCount()} #{@records().length}") if DEBUG
+    console.log("haveData #{@recordCount()} #{@records().length}", @recordCount() > 0 or @records()?.length > 0) if DEBUG
     @recordCount() > 0 or @records()?.length > 0
 
 
@@ -150,7 +160,7 @@ Template.reactiveTableHeading.events
 
 
   'click #download-records': (event, tmpl) ->
-    console.log("Download Records", tmpl, @) #if DEBUG
+    console.log("Download Records", tmpl, @) if DEBUG
 
     tableTitle = @tableTitle or @name or 'records'
     filename = tableTitle + '.csv'
@@ -173,11 +183,12 @@ Template.reactiveTableHeading.events
 #
 
 Template.reactiveTableHeader.onRendered ->
-  @$('[rel="tooltip"]')?.tooltip()
-
+  initTooltip(@)
+  
 
 Template.reactiveTableHeader.onDestroyed ->
-  @$('[rel="tooltip"]')?.destroy?()
+  console.log('reactiveTableHeader tooltips', @toolTips) if DEBUG
+  destroyTooltip(@)
 
 
 Template.reactiveTableHeader.helpers
@@ -195,7 +206,7 @@ Template.reactiveTableHeader.helpers
 Template.reactiveTableHeader.events
   'click .table-col-head': (e, tmpl) ->
     e.preventDefault()
-    tmpl.$('[rel="tooltip"]')?.close?()
+    closeTooltip(tmpl)
     Template.parentData(1).setSort(@dataKey)
 
 
@@ -215,12 +226,14 @@ Template.reactiveTableBody.helpers
 #
 
 Template.reactiveTableRow.onRendered ->
-  @$('.modal').modal()
-  @$('[rel="tooltip"]')?.tooltip()
-
+  #M.Modal.init(@findAll('.modal'))
+  M.Modal.init(@$('.modal'))
+  initTooltip(@)
+  
 
 Template.reactiveTableRow.onDestroyed ->
-  @$('[rel="tooltip"]')?.destroy?()
+  console.log("reactiveTableRow toolTips", @toolTips) if DEBUG
+  destroyTooltip(@)
 
 
 Template.reactiveTableRow.helpers
@@ -247,23 +260,26 @@ Template.reactiveTableRow.events
 
   'click .reactive-table-delete-record': (event, tmpl) ->
     console.log("delete", @,  Template.parentData(1)) if DEBUG
-    tmpl.$('[rel="tooltip"]')?.close?()
+    closeTooltip(tmpl)
     Template.parentData(1).onRemoveRecord?(@)
-    tmpl.$('[rel="tooltip"]')?.close?()
+    closeTooltip(tmpl)
 
 
   'click .reactive-table-edit-record': (event, tmpl) ->
     console.log("edit: TODO: Enable Modal Edit?", @,  Template.parentData(1)) if DEBUG
-    tmpl.$('[rel="tooltip"]')?.close?()
+    closeTooltip(tmpl)
     Template.parentData(1).onUpdateRecord?(@)
-    tmpl.$('[rel="tooltip"]')?.close?()
+    closeTooltip(tmpl)
 
 
 
 Template.reactiveTableCell.onRendered ->
-  @$('.modal').modal()
-  @$('[rel="tooltip"]')?.tooltip()
-
+  #M.Modal.init(@findAll('.modal'))
+  M.Modal.init(@$('.modal'))
+  initTooltip(@)
+  
 
 Template.reactiveTableCell.onDestroyed ->
-  @$('[rel="tooltip"]')?.destroy?()
+  console.log("reactiveTableCell toolTips", @toolTips) if DEBUG
+  destroyTooltip(@)
+

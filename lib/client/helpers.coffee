@@ -16,3 +16,4 @@ Template.registerHelper 'capitalize', (str) ->
 # Capitalize first letter in string
 String::capitalize = ->
   @charAt(0).toUpperCase() + @slice(1)
+

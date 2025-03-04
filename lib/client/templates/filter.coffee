@@ -8,8 +8,10 @@ Template.reactiveTableFilter.onCreated ->
 
 Template.reactiveTableFilter.onRendered ->
   console.log("reactiveTableFilter onRendered") if DEBUG
-  @$('select').formSelect()
-
+  elems = document.querySelectorAll('select')
+  console.log("Issue with findAll and form init", elems, @findAll('select')) if DEBUG
+  @selectInstances = M.FormSelect.init(elems) #@findAll('select'))
+  
 
 Template.reactiveTableFilter.onDestroyed ->
   # ...

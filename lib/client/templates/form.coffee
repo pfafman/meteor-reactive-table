@@ -5,17 +5,33 @@ capitalize = (string) ->
   string.charAt(0).toUpperCase() + string.substring(1).toLowerCase()
 
 
+
+initTooltip = (tmpl) ->
+  tmpl.$('[rel="tooltip"]')?.tooltip()
+  #tmpl.toolTips = M.Tooltip.init(@findAll('[rel="tooltip"]'))
+
+
+destroyTooltip = (tmpl) ->
+  tmpl.$('[rel="tooltip"]')?.destroy?()
+  #tmpl.toolTips?.forEach? (tip) ->
+  #    tip.destroy?()
+
+
+closeTooltip =  (tmpl) ->
+  tmpl.$('[rel="tooltip"]')?.close?()
+
+
+
 Template.reactiveTableForm.onRendered ->
   console.log("reactiveTableForm rendered") if DEBUG
 
 
 Template.reactiveTableFormItem.onRendered ->
-  #console.log("reactiveTableFormItem rendered")
-  @$('[rel="tooltip"]').tooltip()
+  initTooltip(@)
 
 
 Template.reactiveTableFormItem.onDestroyed ->
-  @$('[rel="tooltip"]')?.destroy?()
+  destroyTooltip(@)
 
 
 Template.reactiveTableFormItem.helpers
@@ -66,11 +82,11 @@ Template.reactiveTableFormRange.helpers
 
 
 Template.reactiveTableFormSelect.onRendered ->
-  console.log("reactiveTableFormSelect: init select") if DEBUG
-  @$('select').formSelect()
-  # instance = M.FormSelect.init @find('select'),
-  #   dropdownOptions:
-  #     coverTrigger: false
+  console.log("reactiveTableFormSelect init select") if DEBUG
+  #@$('select').formSelect()
+  instance = M.FormSelect.init @findAll('select'),
+    dropdownOptions:
+      coverTrigger: false
 
 
 Template.reactiveTableFormDate.onRendered ->

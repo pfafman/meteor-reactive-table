@@ -668,13 +668,13 @@ class @ReactiveTableInstance
       console.log("insertRecord", @methodOnInsert, rec) if DEBUG
       if @insertOk(rec) and @checkFields(rec, 'insert')
         if @methodOnInsert
-          Meteor.call @methodOnInsert, rec, (error, rtn) =>
-            if error
-              console.log("Error saving " + @recordName(), error)
-              Materialize.toast("Error saving " + @recordName() + " : #{error.reason}", 3000, 'toast-error')
-            else
-              Materialize.toast(@recordName() + " created", 3000, 'green')
-              @insertRecordCallback?(rtn or rec)
+          try
+            rtn = await Meteor.callAsync(@methodOnInsert, rec)
+            Materialize.toast(@recordName() + " created", 3000, 'green')
+            @insertRecordCallback?(rtn or rec)
+          catch error
+            console.log("Error saving " + @recordName(), error)
+            Materialize.toast("Error saving " + @recordName() + " : #{error.reason}", 3000, 'toast-error')
         else
           @collection.insert rec, (error, effectedCount) =>
             if error
@@ -730,13 +730,12 @@ class @ReactiveTableInstance
     console.log("updateThisRecord", recId, rec) if DEBUG
     if @checkFields(rec, type)
       if @methodOnUpdate
-        Meteor.call @methodOnUpdate, recId, rec, (error, rtn) =>
-          if error
-            console.log("Error updating " + @recordName(), error)
-            Materialize.toast("Error updating " + @recordName() + " : #{error.reason}", 3000, 'toast-error')
-          else if type isnt "inlineUpdate"
-            Materialize.toast(@recordName() + " saved", 3000, 'green')
-            @updateRecordCallback?(rtn or rec)
+        try
+          rtn = await Meteor.callAsync(@methodOnUpdate, recId, rec)
+          Materialize.toast(@recordName() + " saved", 3000, 'green')
+          @updateRecordCallback?(rtn or rec)
+        catch error
+          console.log("Error updating " + @recordName(), error)
       else
         delete rec._id
         @collection.update recId,
@@ -772,10 +771,11 @@ class @ReactiveTableInstance
           if error
             Materialize.toast("Error on delete: #{error.reason}", 4000, 'toast-error')
           else if rtn?.submit
-            Meteor.call @methodOnRemove, rec._id, (error, result) ->
-              if error
-                Materialize.toast("Error on delete: #{error.reason}", 4000, 'toast-error')
-                @removeRecordCallback?()
+            try
+              await Meteor.callAsync(@methodOnRemove, rec._id)
+            catch error
+              Materialize.toast("Error on delete: #{error.reason}", 4000, 'toast-error')
+              @removeRecordCallback?()
 
 
   downloadRecords: (callback, select, downloadFields, limit, headers) =>
@@ -793,7 +793,11 @@ class @ReactiveTableInstance
 
     console.log("downloadRecords", @name, select, fields, limit) if DEBUG
 
-    Meteor.call "reactiveTable_" + @name + "_getCSV", select, fields, limit, headers, callback
+    try
+      rtn = await Meteor.callAsync("reactiveTable_" + @name + "_getCSV", select, fields, limit, headers)
+      callback(null,rtn)
+    catch error
+      callback(error, null)
 
 
 
