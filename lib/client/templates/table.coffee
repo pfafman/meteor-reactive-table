@@ -164,11 +164,9 @@ Template.reactiveTableHeading.events
 
     tableTitle = @tableTitle or @name or 'records'
     filename = tableTitle + '.csv'
-    @downloadRecords (error, csv) ->
-      if error
-        Materialize.toast("Error getting CSV to download", 3000, 'toast-error')
-        console.log("Error getting CSV", error)
-      else if csv
+    try
+      csv = await @downloadRecords()
+      if csv
         console.log("Doing saveAs for CSV", saveAs, csv) if DEBUG
         blob = new Blob [csv],
           type: "text/csv"
@@ -176,6 +174,9 @@ Template.reactiveTableHeading.events
         Materialize.toast("Records Downloaded", 3000, 'toast-success')
       else
         Materialize.toast("No data to download", 3000, 'toast-error')
+    catch error
+      Materialize.toast("Error getting CSV to download", 3000, 'toast-error')
+      console.log("Error getting CSV", error)
 
 
 ################################

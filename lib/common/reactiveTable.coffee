@@ -119,8 +119,9 @@ class @ReactiveTable
     meths["reactiveTable_" + name + "_getCSV"] = (select = {}, fields = {}, limit, downloadHeaders) =>
       check(select, Object)
       check(fields, Object)
-      select = @downLoadPermissionsAndSelect?(select) or select
-      console.log("reactiveTable getCSV", name, JSON.stringify(select), limit, @schema, headers) if DEBUG
+      console.log("reactiveTable getCSV", name, JSON.stringify(select), limit) if DEBUG
+      select = (await @downLoadPermissionsAndSelect?(select)) or select
+      console.log("reactiveTable getCSV", name, JSON.stringify(select), limit) if DEBUG
 
       if Meteor.isServer
         csv = '' #[]
@@ -176,7 +177,7 @@ class @ReactiveTable
 
 
   newTable: (options = {}) =>
-    console.log("newTable") if DEBUG
+    console.log("newTable", options) if DEBUG
     new ReactiveTableInstance(@, options)
 
 
@@ -781,7 +782,8 @@ class @ReactiveTableInstance
               @removeRecordCallback?()
 
 
-  downloadRecords: (callback, select, downloadFields, limit, headers) =>
+  downloadRecords: (select, downloadFields, limit, headers) =>
+    console.log("downloadRecords select", @select(), select) if DEBUG
     select = @select() unless select
 
     fields = {}
@@ -794,13 +796,12 @@ class @ReactiveTableInstance
         dataKey = col.dataKey or col.sortKey or key
         fields[dataKey] = 1
 
-    console.log("downloadRecords", @name, select, fields, limit) if DEBUG
+    console.log("downloadRecords callAsync", @name, select, fields, limit) if DEBUG
 
-    try
-      rtn = await Meteor.callAsync("reactiveTable_" + @name + "_getCSV", select, fields, limit, headers)
-      callback(null,rtn)
-    catch error
-      callback(error, null)
+    rtn = await Meteor.callAsync("reactiveTable_" + @name + "_getCSV", select, fields, limit, headers)
+    console.log("downloadRecords", rtn) if DEBUG
+
+    rtn
 
 
 
